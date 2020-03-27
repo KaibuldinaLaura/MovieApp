@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">WikiHow</string>
+    <string name="pic1">pic1</string>
+    <string name="title">title</string>
+    <string name="Title1">How to Relax with Nature</string>
+    <string name="text1">Have you had a very busy day? You might want to relax now. There are beautiful sights to see in nature. It is very peaceful and rejuvenating when you relax with nature. There are so many ways you can enjoy nature, and so many things there! Read this article, to find out how you can make the best of your time in nature!</string>
+    <string name="pic2">pic2</string>
+    <string name="step1">Go to a park or a beach some place where you\'ll find nature at its best.</string>
+    <string name="step2text">If you like oceans, you should relax by the seashore, where you can lie down on the soft sand, hear the sound of the waves, watch the fish swim, and gaze at the little sunlight sparkles dancing on the water.</string>
+    <string name="steps">Steps</string>
+    <string name="s1check">s1check</string>
+    <string name="_1_of_3">1 of 3</string>
+    <string name="pic3">pic3</string>
+    <string name="textview">TextView</string>
+    <string name="text5">Find a quiet, peaceful spot.</string>
+    <string name="text6">This spot may be under a tree, on the seashore, or any place you think is suitable for relaxation. Relaxing isn\'t the same when it is too loud where you are relaxing, but the sounds of nature like the leaves, the waves, and any type of nature are very relaxing and beautiful.</string>
+    <string name="text7">Relax.</string>
+    <string name="text8">Sit on the grass or on a rock somewhere. Feel it.</string>
+    <string name="_3_of_3">3 of 3</string>
+    <string name="_2_of_3">2 of 3</string>
+    <string name="pic4">pic4</string>
+</resources>

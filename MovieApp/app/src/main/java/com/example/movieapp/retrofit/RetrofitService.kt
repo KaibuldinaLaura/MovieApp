@@ -87,3 +87,4 @@ interface MovieApi {
     @GET("movie/{movie_id}")
     fun getMovieById(@Path("movie_id") movieId: Int) :Call<MoviesData>
 }
+

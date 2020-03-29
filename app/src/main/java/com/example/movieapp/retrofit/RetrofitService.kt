@@ -19,15 +19,15 @@ import java.util.concurrent.TimeUnit
 object RetrofitService  {
 
     private const val BASE_URL = "https://api.themoviedb.org/3/"
-    private  var movieApi: MovieApi
-   init {
+    private lateinit var movieApi: MovieApi
+   fun getMovieApi(): MovieApi {
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(getOkHttp())
             .build()
-        movieApi =  retrofit.create(
-            MovieApi::class.java)
+        movieApi =  retrofit.create(MovieApi::class.java)
+       return movieApi
     }
     private fun getOkHttp(): OkHttpClient {
         val okHttpClient = OkHttpClient.Builder()
@@ -46,35 +46,6 @@ object RetrofitService  {
             level = HttpLoggingInterceptor.Level.BODY
         }
     }
-
-    fun getPopularMovies(
-        page: Int = 1,
-        onSuccess: (movies: List<MoviesData>) -> Unit,
-        onError: () -> Unit
-    ) {
-        movieApi.getPopularMovies(page = page)
-            .enqueue(object : Callback<MovieResponse> {
-                override fun onResponse(
-                    call: Call<MovieResponse>,
-                    response: Response<MovieResponse>
-                ) {
-                    if (response.isSuccessful) {
-                        val responseBody = response.body()
-
-                        if (responseBody != null) {
-                            onSuccess.invoke(responseBody.movies)
-                        } else {
-                            onError.invoke()
-                        }
-                    } else {
-                        onError.invoke()
-                    }
-                }
-                override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                    onError.invoke()
-                }
-            })
-    }
 }
 
 interface MovieApi {
@@ -85,7 +56,9 @@ interface MovieApi {
     ): Call<MovieResponse>
 
     @GET("movie/{movie_id}")
-    fun getMovieById(@Path("movie_id") movieId: Int) :Call<MoviesData>
+    fun getMovieById(@Path("movie_id") movieId: Int,
+                     @Query("api_key") apiKey: String = "88f972ac2b5f07d969202c8ffbaaaffa")
+            :Call<MoviesData>
 }
 
 //testing new branch 

@@ -13,9 +13,13 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.movieapp.R
+import com.example.movieapp.model.MovieResponse
 import com.example.movieapp.model.MoviesData
 import com.example.movieapp.retrofit.RetrofitService
 import com.example.movieapp.ui.DetailsActivity
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 open class MoviesFragment: Fragment() {
 
@@ -48,8 +52,7 @@ open class MoviesFragment: Fragment() {
         initView()
 
         }
-
-    private fun initView(){
+    private fun initView() {
         setUpAdapter()
         inititializeRecyclerView()
     }
@@ -58,7 +61,7 @@ open class MoviesFragment: Fragment() {
         moviesAdapter?.setOnItemClickListener(onItemClickListener = object : OnItemClickListner {
             override fun onItemClick(position: Int, view: View) {
                 val intent = Intent(activity, DetailsActivity::class.java)
-                intent.putExtra("movieId", moviesAdapter!!.getItemId(position))
+                intent.putExtra("movieId", moviesAdapter!!.getItem(position)?.id)
                 startActivity(intent)
             }
         })
@@ -73,12 +76,40 @@ open class MoviesFragment: Fragment() {
         )
         recyclerView.adapter = moviesAdapter
 
-        RetrofitService.getPopularMovies(
+        getPopularMovies(
             onSuccess = :: onPopularMoviesFetched,
-            onError = :: onError
+            onError =  :: onError
         )
     }
 
+    private fun getPopularMovies(
+        page: Int = 1,
+        onSuccess: (movies: List<MoviesData>) -> Unit,
+        onError: () -> Unit
+    ) {
+        RetrofitService.getMovieApi().getPopularMovies(page = page)
+            .enqueue(object : Callback<MovieResponse> {
+                override fun onResponse(
+                    call: Call<MovieResponse>,
+                    response: Response<MovieResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val responseBody = response.body()
+
+                        if (responseBody != null) {
+                            onSuccess.invoke(responseBody.movies)
+                        } else {
+                            onError.invoke()
+                        }
+                    } else {
+                        onError.invoke()
+                    }
+                }
+                override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+                    onError.invoke()
+                }
+            })
+    }
 
 
     private fun onPopularMoviesFetched(movies: List<MoviesData>) {

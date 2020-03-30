@@ -39,7 +39,6 @@ class SecondActivity : AppCompatActivity(){
         false
     }
 
-
     override fun onBackPressed() {
         super.onBackPressed()
         return

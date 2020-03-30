@@ -1,6 +1,8 @@
 package com.example.movieapp.ui
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -8,7 +10,6 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.movieapp.R
-import com.example.movieapp.ui.profile.ProfileFragment
 
 
 class MainActivity : AppCompatActivity() {
@@ -26,17 +27,21 @@ class MainActivity : AppCompatActivity() {
         val password: EditText? = findViewById(R.id.editText4)
         buttonReg = findViewById(R.id.buttonReg)
 
+        var myPrefs: SharedPreferences
+
         buttonReg.setOnClickListener(View.OnClickListener {
             if(name?.text.toString().isNotEmpty()
             && surname?.text.toString().isNotEmpty()
             && login?.text.toString().isNotEmpty()
             && password?.text.toString().isNotEmpty()){
 
-                val bundle = Bundle()
-                bundle.putString("name", name?.text.toString())
-                //bundle.putString("surname", surname?.text.toString())
-                val fragment = ProfileFragment()
-                fragment.arguments = bundle
+                myPrefs = getSharedPreferences("prefID", Context.MODE_PRIVATE);
+                val editor: SharedPreferences.Editor = myPrefs.edit()
+                editor.putString("name", name?.text.toString())
+                editor.putString("surname", surname?.text.toString())
+                editor.apply()
+                //editor.commit();
+
                 val intent = Intent( baseContext, SecondActivity::class.java)
                 startActivity(intent)
             }

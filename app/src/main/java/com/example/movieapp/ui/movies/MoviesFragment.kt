@@ -1,14 +1,11 @@
 package com.example.movieapp.ui.movies
 
-import android.content.ClipData.newIntent
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -69,7 +66,7 @@ open class MoviesFragment: Fragment() {
     }
 
     private fun inititializeRecyclerView() {
-        recyclerView = rootView.findViewById(R.id.moviesRecyclerView)
+        recyclerView = rootView.findViewById(R.id.moviesRecyclerView1)
         recyclerView.layoutManager = LinearLayoutManager(
             activity,
             LinearLayoutManager.HORIZONTAL,

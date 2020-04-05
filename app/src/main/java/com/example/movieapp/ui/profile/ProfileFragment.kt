@@ -27,10 +27,12 @@ class ProfileFragment: Fragment() {
 
         val tvName = rootView.findViewById<TextView>(R.id.tvName)
         val tvSurname = rootView.findViewById<TextView>(R.id.tvSurname)
+        val tvUsername = rootView.findViewById<TextView>(R.id.tvUsername)
 
         myPrefs = activity?.getSharedPreferences("prefID", Context.MODE_PRIVATE)!!
         tvName.text = "Name: " + myPrefs.getString("name", null)
         tvSurname.text = "Surname: " + myPrefs.getString("surname", null)
+        tvUsername.text = "Username: " + myPrefs.getString("username", null)
 
         return rootView
     }

@@ -8,7 +8,7 @@
 
     <EditText
         android:id="@+id/editText1"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
         android:hint="enter name"
@@ -20,7 +20,7 @@
 
     <EditText
         android:id="@+id/editText2"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:hint="enter surname"
@@ -32,7 +32,7 @@
 
     <EditText
         android:id="@+id/editText3"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:hint="enter username"
@@ -44,7 +44,7 @@
 
     <EditText
         android:id="@+id/editText4"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:hint="enter password"
@@ -57,10 +57,10 @@
 
     <Button
         android:id="@+id/buttonReg"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:background="@android:color/white"
+        android:background="@drawable/shape"
         android:text="registrate"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

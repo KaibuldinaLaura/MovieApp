@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity() {
                 val editor: SharedPreferences.Editor = myPrefs.edit()
                 editor.putString("name", name?.text.toString())
                 editor.putString("surname", surname?.text.toString())
+                editor.putString("username", login?.text.toString())
                 editor.apply()
                 getToken()
 

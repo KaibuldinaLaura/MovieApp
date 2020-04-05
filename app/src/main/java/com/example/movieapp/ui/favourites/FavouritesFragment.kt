@@ -119,12 +119,9 @@ open class FavouritesFragment: Fragment() {
 
 
     private fun onPopularMoviesFetched(movies: List<MoviesData>) {
-
         moviesAdapter?.addItems(movies as ArrayList<MoviesData>)
     }
-
     private fun onError() {
         Log.e("Error", "Error")
     }
-
 }

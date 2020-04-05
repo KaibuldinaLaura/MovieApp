@@ -10,25 +10,6 @@
     app:cardCornerRadius="4dp"
     tools:ignore="MissingDefaultResource">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/idd"
-        android:layout_width="127dp"
-        android:layout_height="170dp">
-
-        <ImageButton
-            android:id="@+id/imageButton"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:scaleType="fitXY"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.257"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.971"
-            app:srcCompat="@drawable/fav_icon" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
     <ImageView
         android:id="@+id/item_movie_image"
         android:layout_width="match_parent"

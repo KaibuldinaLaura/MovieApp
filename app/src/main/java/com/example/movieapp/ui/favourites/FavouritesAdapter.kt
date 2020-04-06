@@ -7,8 +7,8 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.movieapp.R
-import com.example.movieapp.model.MoviesData
-import com.example.movieapp.ui.movies.BaseRecyclerViewAdapter
+import com.example.movieapp.model.data.MoviesData
+import com.example.movieapp.base.BaseRecyclerViewAdapter
 
 class FavouritesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

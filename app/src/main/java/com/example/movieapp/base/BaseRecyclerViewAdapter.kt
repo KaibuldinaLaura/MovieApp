@@ -1,9 +1,7 @@
-package com.example.movieapp.ui.movies
+package com.example.movieapp.base
 
 import android.os.Handler
 import android.os.Looper
-import android.view.View
-import android.widget.AdapterView
 import androidx.recyclerview.widget.RecyclerView
 
 abstract class BaseRecyclerViewAdapter<T>: RecyclerView.Adapter<RecyclerView.ViewHolder>() {

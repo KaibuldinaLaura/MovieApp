@@ -9,12 +9,12 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.movieapp.R
-import com.example.movieapp.model.MovieResponse
-import com.example.movieapp.model.MoviesData
-import com.example.movieapp.retrofit.RetrofitService
+import com.example.movieapp.model.data.MovieResponse
+import com.example.movieapp.model.data.MoviesData
+import com.example.movieapp.model.network.RetrofitService
 import com.example.movieapp.ui.DetailsActivity
-import com.example.movieapp.ui.movies.MoviesAdapter
-import com.example.movieapp.ui.movies.OnItemClickListner
+import com.example.movieapp.ui.movies.adapters.MoviesAdapter
+import com.example.movieapp.base.OnItemClickListner
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -63,7 +63,8 @@ open class FavouritesFragment: Fragment() {
     }
 
     private fun setUpAdapter(){
-        moviesAdapter?.setOnItemClickListener(onItemClickListener = object : OnItemClickListner {
+        moviesAdapter?.setOnItemClickListener(onItemClickListener = object :
+            OnItemClickListner {
             override fun onItemClick(position: Int, view: View) {
                 val intent = Intent(activity, DetailsActivity::class.java)
                 intent.putExtra("movieId", moviesAdapter!!.getItem(position)?.id)

@@ -1,4 +1,4 @@
-package com.example.movieapp.ui.movies
+package com.example.movieapp.base
 
 import android.view.View
 

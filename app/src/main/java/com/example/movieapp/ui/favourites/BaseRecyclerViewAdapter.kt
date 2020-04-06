@@ -3,7 +3,7 @@ package com.example.movieapp.ui.favourites
 import android.os.Handler
 import android.os.Looper
 import androidx.recyclerview.widget.RecyclerView
-import com.example.movieapp.ui.movies.OnItemClickListner
+import com.example.movieapp.base.OnItemClickListner
 
 abstract class BaseRecyclerViewAdapter<T>: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 

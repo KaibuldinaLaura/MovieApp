@@ -1,10 +1,10 @@
-package com.example.movieapp.retrofit
+package com.example.movieapp.model.network
 
 import android.util.Log
 import com.example.movieapp.login.LoginData
 import com.example.movieapp.login.TokenResponse
-import com.example.movieapp.model.MovieResponse
-import com.example.movieapp.model.MoviesData
+import com.example.movieapp.model.data.MovieResponse
+import com.example.movieapp.model.data.MoviesData
 import com.example.movieapp.ui.favourites.FavMovie
 import com.example.movieapp.ui.favourites.FavResponse
 import com.example.movieapp.ui.favourites.RequestSession
@@ -12,6 +12,7 @@ import com.example.movieapp.ui.favourites.SessionId
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
@@ -30,7 +31,8 @@ object RetrofitService  {
             .addConverterFactory(GsonConverterFactory.create())
             .client(getOkHttp())
             .build()
-        movieApi =  retrofit.create(MovieApi::class.java)
+        movieApi =  retrofit.create(
+            MovieApi::class.java)
         return movieApi
     }
     private fun getOkHttp(): OkHttpClient {
@@ -67,6 +69,24 @@ interface MovieApi {
         @Query("api_key") apiKey: String = "88f972ac2b5f07d969202c8ffbaaaffa",
         @Query("page") page: Int
     ): Call<MovieResponse>
+
+    @GET("movie/popular")
+   suspend fun getPopularMoviesCoroutine(
+        @Query("api_key") apiKey: String = "88f972ac2b5f07d969202c8ffbaaaffa",
+        @Query("page") page: Int
+    ): Response<MovieResponse>
+
+    @GET("movie/now_playing")
+    fun getNowPlayingMovie(
+        @Query("api_key") apiKey: String = "88f972ac2b5f07d969202c8ffbaaaffa",
+        @Query("page") page: Int
+    ): Call<MovieResponse>
+
+    @GET("movie/now_playing")
+    suspend fun getNowPlayingMovieCoroutine(
+        @Query("api_key") apiKey: String = "88f972ac2b5f07d969202c8ffbaaaffa",
+        @Query("page") page: Int
+    ): Response<MovieResponse>
 
     @GET("movie/{movie_id}")
     fun getMovieById(@Path("movie_id") movieId: Int,

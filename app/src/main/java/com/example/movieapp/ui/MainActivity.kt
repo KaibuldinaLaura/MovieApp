@@ -10,12 +10,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.movieapp.BuildConfig
 import com.example.movieapp.R
 import com.example.movieapp.login.LoginData
 import com.example.movieapp.login.TokenResponse
-import com.example.movieapp.retrofit.MovieApi
-import com.example.movieapp.retrofit.RetrofitService
+import com.example.movieapp.model.network.MovieApi
+import com.example.movieapp.model.network.RetrofitService
 import com.example.movieapp.ui.favourites.RequestSession
 import com.example.movieapp.ui.favourites.SessionId
 import retrofit2.Call
@@ -66,7 +65,8 @@ class MainActivity : AppCompatActivity() {
     private fun getToken(){
         try {
 
-            val api: MovieApi? = RetrofitService.getClient()?.create(MovieApi::class.java)
+            val api: MovieApi? = RetrofitService.getClient()?.create(
+                MovieApi::class.java)
             api?.getRequestToken("88f972ac2b5f07d969202c8ffbaaaffa")
                 ?.enqueue(object : Callback<TokenResponse?> {
                     override fun onFailure(call: Call<TokenResponse?>, t: Throwable) {
@@ -97,7 +97,8 @@ class MainActivity : AppCompatActivity() {
     fun login() {
         try {
 
-            val api: MovieApi? = RetrofitService.getClient()?.create(MovieApi::class.java)
+            val api: MovieApi? = RetrofitService.getClient()?.create(
+                MovieApi::class.java)
             api?.login(LoginData(login.text.toString(), password.text.toString(), requestedToken))
                 ?.enqueue(object : Callback<TokenResponse?> {
                     override fun onFailure(call: Call<TokenResponse?>, t: Throwable) {
@@ -128,7 +129,8 @@ class MainActivity : AppCompatActivity() {
         Log.d("start", token)
         try {
 
-            val api: MovieApi? = RetrofitService.getClient()?.create(MovieApi::class.java)
+            val api: MovieApi? = RetrofitService.getClient()?.create(
+                MovieApi::class.java)
             api?.getSession(SessionId(token))
                 ?.enqueue(object : Callback<RequestSession?> {
                     override fun onFailure(call: Call<RequestSession?>, t: Throwable) {

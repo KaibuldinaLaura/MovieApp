@@ -1,7 +1,6 @@
 package com.example.movieapp.ui
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -12,8 +11,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.movieapp.R
-import com.example.movieapp.model.MoviesData
-import com.example.movieapp.retrofit.RetrofitService
+import com.example.movieapp.model.data.MoviesData
+import com.example.movieapp.model.network.RetrofitService
 import com.example.movieapp.ui.favourites.FavMovie
 import com.example.movieapp.ui.favourites.FavResponse
 import retrofit2.Call

@@ -1,3 +1,4 @@
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -23,6 +24,8 @@ open class FavouritesFragment: Fragment() {
     lateinit var recyclerView: RecyclerView
     private var moviesAdapter: MoviesAdapter? = null
     private lateinit var rootView: View
+    var sessionId: String ?=null
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +42,9 @@ open class FavouritesFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val pref =
+            activity!!.getSharedPreferences("prefID", Context.MODE_PRIVATE)
+        sessionId = pref.getString("sessionID", "empty")
         rootView = inflater.inflate(R.layout.fragment_favourites
             , container, false)
         return rootView
@@ -86,11 +92,11 @@ open class FavouritesFragment: Fragment() {
         onSuccess: (movies: List<MoviesData>) -> Unit,
         onError: () -> Unit
     ) {
-        RetrofitService.getMovieApi().getPopularMovies(page = page)
-            .enqueue(object : Callback<MovieResponse> {
+        RetrofitService.getMovieApi().getFavList(sessionId)
+            ?.enqueue(object : Callback<MovieResponse?> {
                 override fun onResponse(
-                    call: Call<MovieResponse>,
-                    response: Response<MovieResponse>
+                    call: Call<MovieResponse?>,
+                    response: Response<MovieResponse?>
                 ) {
                     if (response.isSuccessful) {
                         val responseBody = response.body()
@@ -104,7 +110,8 @@ open class FavouritesFragment: Fragment() {
                         onError.invoke()
                     }
                 }
-                override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+
+                override fun onFailure(call: Call<MovieResponse?>, t: Throwable) {
                     onError.invoke()
                 }
             })
@@ -112,12 +119,9 @@ open class FavouritesFragment: Fragment() {
 
 
     private fun onPopularMoviesFetched(movies: List<MoviesData>) {
-
         moviesAdapter?.addItems(movies as ArrayList<MoviesData>)
     }
-
     private fun onError() {
         Log.e("Error", "Error")
     }
-
 }

@@ -3,35 +3,49 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="128dp"
-    android:layout_height="172dp"
-    android:layout_marginEnd="8dp"
+    android:layout_height="225dp"
+    android:layout_marginEnd="4dp"
     android:layout_marginRight="8dp"
-    android:background="#00203f "
+    android:background="#00203f"
+    app:cardBackgroundColor="#00203f"
     app:cardCornerRadius="4dp"
     tools:ignore="MissingDefaultResource">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/idd"
-        android:layout_width="127dp"
-        android:layout_height="170dp">
-
-        <ImageButton
-            android:id="@+id/imageButton"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:scaleType="fitXY"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.257"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.971"
-            app:srcCompat="@drawable/fav_icon" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView
         android:id="@+id/item_movie_image"
         android:layout_width="match_parent"
-        android:layout_height="120dp" />
+        android:layout_height="160dp" />
+
+    <TextView
+        android:id="@+id/movie_title"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_marginTop="165dp"
+        android:layout_marginLeft="8dp"
+        android:fontFamily="sans-serif"
+        android:textColor="@android:color/white"
+        android:textSize="18dp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="199dp">
+
+        <ImageView
+            android:layout_width="21dp"
+            android:layout_height="21dp"
+            android:src="@drawable/ic_event_note_black_24dp" />
+
+        <TextView
+            android:id="@+id/release_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="16dp" />
+    </LinearLayout>
+
 
 </androidx.cardview.widget.CardView>

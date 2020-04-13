@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:background="#00203f "
         tools:context=".ui.DetailsActivity">
@@ -16,18 +16,20 @@
             android:layout_width="match_parent"
             android:layout_height="350dp"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:contentDescription="@string/todo" />
 
         <TextView
             android:id="@+id/text_view_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
+            android:layout_marginStart="15dp"
             android:layout_below="@id/image_view"
             android:layout_centerHorizontal="false"
             android:textColor="@android:color/white"
             android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_marginLeft="15dp" />
         <TextView
             android:id="@+id/text_view_description"
             android:layout_width="wrap_content"
@@ -37,7 +39,8 @@
             android:layout_centerHorizontal="false"
             android:textColor="@android:color/white"
             android:layout_marginTop="50dp"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:layout_marginStart="15dp" />
 
         <ImageButton
             android:id="@+id/imageButton"
@@ -47,7 +50,9 @@
             android:layout_marginStart="180dp"
             android:layout_marginLeft="100dp"
             android:scaleType="fitXY"
-            app:srcCompat="@drawable/fav_icon" />
+            app:srcCompat="@drawable/fav_icon"
+            android:contentDescription="TODO"
+            tools:ignore="ContentDescription,HardcodedText" />
         <TextView
             android:id="@+id/text_view_rating"
             android:layout_marginTop="20dp"
@@ -55,10 +60,12 @@
             android:layout_width="match_parent"
             android:text="Ratings and reviews"
             android:textColor="@android:color/white"
-            android:textSize="24dp"
+            android:textSize="24sp"
             android:layout_marginLeft="15dp"
             android:textStyle="bold"
-            android:layout_below="@id/imageButton">
+            android:layout_below="@id/imageButton"
+            tools:ignore="HardcodedText"
+            android:layout_marginStart="15dp">
         </TextView>
         <LinearLayout
             android:id="@+id/minus"
@@ -71,20 +78,23 @@
                 android:layout_height="40dp"
                 android:layout_width="50dp"
                 android:layout_marginLeft="15dp"
-                android:src="@drawable/ic_remove_black_24dp"/>
-            />
+                android:src="@drawable/ic_remove_black_24dp"
+                tools:ignore="ContentDescription"
+                android:layout_marginStart="15dp" />
             <ImageView
                 android:layout_height="40dp"
                 android:layout_width="50dp"
                 android:layout_marginLeft="60dp"
-                android:src="@drawable/ic_remove_black_24dp"/>
-            />
+                android:src="@drawable/ic_remove_black_24dp"
+                tools:ignore="ContentDescription"
+                android:layout_marginStart="60dp" />
             <ImageView
                 android:layout_height="40dp"
                 android:layout_width="50dp"
                 android:layout_marginLeft="60dp"
-                android:src="@drawable/ic_remove_black_24dp"/>
-            />
+                android:src="@drawable/ic_remove_black_24dp"
+                tools:ignore="ContentDescription"
+                android:layout_marginStart="60dp" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/sites"
@@ -97,23 +107,29 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Kino.kz"
-                android:textSize="16dp"
+                android:textSize="16sp"
                 android:textColor="#ffbc40"
-                android:layout_marginLeft="15dp"/>
+                android:layout_marginLeft="15dp"
+                tools:ignore="HardcodedText"
+                android:layout_marginStart="15dp" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="IMDB"
-                android:textSize="16dp"
+                android:textSize="16sp"
                 android:textColor="#00cdff"
-                android:layout_marginLeft="65dp"/>
+                android:layout_marginLeft="65dp"
+                tools:ignore="HardcodedText"
+                android:layout_marginStart="65dp" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="KinoPoisk"
-                android:textSize="16dp"
+                android:textSize="16sp"
                 android:textColor="#ffa500"
-                android:layout_marginLeft="65dp"/>
+                android:layout_marginLeft="65dp"
+                android:layout_marginStart="65dp"
+                tools:ignore="HardcodedText" />
         </LinearLayout>
         <View
             android:id="@+id/view1"
@@ -129,7 +145,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:textColor="#fff"
-            android:textSize="21dp"
+            android:textSize="21sp"
             android:textStyle="bold"
             android:textAllCaps="false"
             android:textAlignment="center"
@@ -147,12 +163,15 @@
             android:layout_below="@id/view2"
             android:layout_marginLeft="38dp"
             android:layout_marginTop="30dp"
+            android:layout_marginBottom="15dp"
             android:text="Notify about movie release"
             android:textAllCaps="false"
-            android:textSize="18dp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@android:color/white"
-            android:background="@drawable/button"/>
+            android:background="@drawable/button"
+            android:layout_marginStart="38dp"
+            tools:ignore="HardcodedText" />
 
     </RelativeLayout>
 </ScrollView>

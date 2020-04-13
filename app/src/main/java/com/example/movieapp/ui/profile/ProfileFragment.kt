@@ -1,6 +1,6 @@
 package com.example.movieapp.ui.profile
 
-import android.content.Context
+import android.annotation.SuppressLint
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -10,14 +10,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.movieapp.R
-import com.example.movieapp.ui.MainActivity
 
 
 class ProfileFragment: Fragment() {
 
-    lateinit var rootView: View
-    lateinit var myPrefs: SharedPreferences
+    private lateinit var rootView: View
+    private lateinit var myPrefs: SharedPreferences
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -29,10 +29,10 @@ class ProfileFragment: Fragment() {
         val tvSurname = rootView.findViewById<TextView>(R.id.tvSurname)
         val tvUsername = rootView.findViewById<TextView>(R.id.tvUsername)
 
-        myPrefs = activity?.getSharedPreferences("prefID", Context.MODE_PRIVATE)!!
-        tvName.text = "Name: " + myPrefs.getString("name", null)
-        tvSurname.text = "Surname: " + myPrefs.getString("surname", null)
-        tvUsername.text = "Username: " + myPrefs.getString("username", null)
+        myPrefs = activity?.getSharedPreferences("prefID", MODE_PRIVATE)!!
+        tvName.text = """Name: ${myPrefs.getString("name", null)}"""
+        tvSurname.text = """Surname: ${myPrefs.getString("surname", null)}"""
+        tvUsername.text = """Username: ${myPrefs.getString("username", null)}"""
 
         return rootView
     }

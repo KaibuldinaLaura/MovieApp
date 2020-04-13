@@ -18,7 +18,7 @@ class MoviesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        var myHolder = holder as? MoviesViewHolder
+        val myHolder = holder as? MoviesViewHolder
         getItem(position)?.let { myHolder?.bind(movie = it) }
     }
 
@@ -36,8 +36,8 @@ class MoviesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
             Glide.with(itemView)
                 .load("https://image.tmdb.org/t/p/w342${movie.posterPath}")
                 .into(movieImageView)
-            movieTitle.text = movie?.title
-            movieReleaseDate.text = movie?.releaseDate
+            movieTitle.text = movie.title
+            movieReleaseDate.text = movie.releaseDate
         }
 
         override fun onClick(v: View?) {

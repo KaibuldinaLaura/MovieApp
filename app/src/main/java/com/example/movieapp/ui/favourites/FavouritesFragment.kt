@@ -1,3 +1,4 @@
+package com.example.movieapp.ui.favourites
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -14,17 +15,17 @@ import com.example.movieapp.model.MoviesData
 import com.example.movieapp.retrofit.RetrofitService
 import com.example.movieapp.ui.DetailsActivity
 import com.example.movieapp.ui.movies.MoviesAdapter
-import com.example.movieapp.ui.movies.OnItemClickListner
+import com.example.movieapp.ui.movies.OnItemClickListener
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 open class FavouritesFragment: Fragment() {
 
-    lateinit var recyclerView: RecyclerView
+    private lateinit var recyclerView: RecyclerView
     private var moviesAdapter: MoviesAdapter? = null
     private lateinit var rootView: View
-    var sessionId: String ?=null
+    private var sessionId: String ?=null
 
 
 
@@ -63,7 +64,7 @@ open class FavouritesFragment: Fragment() {
     }
 
     private fun setUpAdapter(){
-        moviesAdapter?.setOnItemClickListener(onItemClickListener = object : OnItemClickListner {
+        moviesAdapter?.setOnItemClickListener(onItemClickListener = object : OnItemClickListener {
             override fun onItemClick(position: Int, view: View) {
                 val intent = Intent(activity, DetailsActivity::class.java)
                 intent.putExtra("movieId", moviesAdapter!!.getItem(position)?.id)
@@ -88,7 +89,6 @@ open class FavouritesFragment: Fragment() {
     }
 
     private fun getPopularMovies(
-        page: Int = 1,
         onSuccess: (movies: List<MoviesData>) -> Unit,
         onError: () -> Unit
     ) {

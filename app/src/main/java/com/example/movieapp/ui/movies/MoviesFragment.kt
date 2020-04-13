@@ -20,11 +20,10 @@ import retrofit2.Response
 
 open class MoviesFragment: Fragment() {
 
-    lateinit var recyclerView: RecyclerView
+    private lateinit var recyclerView: RecyclerView
     private var moviesAdapter: MoviesAdapter? = null
     private lateinit var rootView: View
-
-
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         onCreateComponent()
@@ -56,7 +55,7 @@ open class MoviesFragment: Fragment() {
     }
 
     private fun setUpAdapter(){
-        moviesAdapter?.setOnItemClickListener(onItemClickListener = object : OnItemClickListner {
+        moviesAdapter?.setOnItemClickListener(onItemClickListener = object : OnItemClickListener {
             override fun onItemClick(position: Int, view: View) {
                 val intent = Intent(activity, DetailsActivity::class.java)
                 intent.putExtra("movieId", moviesAdapter!!.getItem(position)?.id)
@@ -108,14 +107,10 @@ open class MoviesFragment: Fragment() {
                 }
             })
     }
-
-
     private fun onPopularMoviesFetched(movies: List<MoviesData>) {
         moviesAdapter?.addItems(movies as ArrayList<MoviesData>)
     }
-
     private fun onError() {
       Log.e("Error", "Error")
     }
-
 }

@@ -18,7 +18,7 @@ class FavouritesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        var myHolder = holder as? MoviesViewHolder
+        val myHolder = holder as? MoviesViewHolder
         getItem(position)?.let { myHolder?.bind(movie = it) }
     }
 

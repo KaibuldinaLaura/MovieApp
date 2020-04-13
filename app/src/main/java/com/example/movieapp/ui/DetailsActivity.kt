@@ -23,8 +23,10 @@ import retrofit2.Response
 class DetailsActivity : AppCompatActivity() {
 
     private lateinit var imageView: ImageView
-    private lateinit var textView: TextView
+    private lateinit var textViewTitle: TextView
+    private lateinit var textViewDesc: TextView
     private lateinit var likeBtn: ImageButton
+    private lateinit var textViewRating: TextView
     var sessionId: String ?=null
     private var movie_id:Int?=null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,11 +36,13 @@ class DetailsActivity : AppCompatActivity() {
 
         val movieId = intent.getIntExtra("movieId", 1)
 
-        textView = findViewById(R.id.text_view)
+        textViewTitle = findViewById(R.id.text_view_title)
+        textViewDesc = findViewById(R.id.text_view_description)
         imageView = findViewById(R.id.image_view)
         likeBtn = findViewById(R.id.imageButton)
+        textViewRating = findViewById(R.id.rating)
 
-        textView.text = "Showing information of "
+        textViewDesc.text = "Showing information of "
         val pref = getSharedPreferences("prefID",Context.MODE_PRIVATE)
         sessionId = pref.getString("sessionID", "empty")
 
@@ -61,7 +65,9 @@ class DetailsActivity : AppCompatActivity() {
                         val responseBody = response.body()
                         Log.d("Check", responseBody?.title ?: "google")
                         if (responseBody != null) {
-                            textView.text = responseBody.overview
+                            textViewTitle.text = responseBody.title
+                            textViewDesc.text = responseBody.overview
+                            textViewRating.text = "Your rating - " + responseBody.rating + "/10"
                             movie_id=response.body()?.id
                             Glide.with(applicationContext)
                                 .load("https://image.tmdb.org/t/p/w342${response.body()!!.posterPath}")

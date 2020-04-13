@@ -1,38 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#00203f "
-    tools:context=".ui.DetailsActivity">
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:background="#00203f "
+        tools:context=".ui.DetailsActivity">
 
-    <ImageView
-        android:id="@+id/image_view"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="16dp" />
+        <ImageView
+            android:id="@+id/image_view"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="16dp" />
 
-    <TextView
-        android:id="@+id/text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/image_view"
-        android:layout_centerHorizontal="true"
-        android:textColor="@android:color/white"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        <TextView
+            android:id="@+id/text_view_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_below="@id/image_view"
+            android:layout_centerHorizontal="false"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/text_view_description"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/text_view_title"
+            android:layout_centerHorizontal="false"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="50dp"
+            android:textSize="20sp" />
 
+        <ImageButton
+            android:id="@+id/imageButton"
+            android:layout_width="50dp"
+            android:layout_below="@id/text_view_description"
+            android:layout_height="50dp"
+            android:layout_marginStart="180dp"
+            android:layout_marginLeft="100dp"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/fav_icon" />
+        <TextView
+            android:id="@+id/text_view_rating"
+            android:layout_marginTop="20dp"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:text="Ratings and reviews"
+            android:textColor="@android:color/white"
+            android:textSize="24dp"
+            android:layout_marginLeft="15dp"
+            android:textStyle="bold"
+            android:layout_below="@id/imageButton">
+        </TextView>
+        <LinearLayout
+            android:id="@+id/minus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="15dp"
+            android:layout_below="@id/text_view_rating">
+            <ImageView
+                android:layout_height="40dp"
+                android:layout_width="50dp"
+                android:layout_marginLeft="15dp"
+                android:src="@drawable/ic_remove_black_24dp"/>
+            />
+            <ImageView
+                android:layout_height="40dp"
+                android:layout_width="50dp"
+                android:layout_marginLeft="60dp"
+                android:src="@drawable/ic_remove_black_24dp"/>
+            />
+            <ImageView
+                android:layout_height="40dp"
+                android:layout_width="50dp"
+                android:layout_marginLeft="60dp"
+                android:src="@drawable/ic_remove_black_24dp"/>
+            />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/sites"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_below="@id/minus">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kino.kz"
+                android:textSize="16dp"
+                android:textColor="#ffbc40"
+                android:layout_marginLeft="15dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="IMDB"
+                android:textSize="16dp"
+                android:textColor="#00cdff"
+                android:layout_marginLeft="65dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="KinoPoisk"
+                android:textSize="16dp"
+                android:textColor="#ffa500"
+                android:layout_marginLeft="65dp"/>
+        </LinearLayout>
+        <View
+            android:id="@+id/view1"
+            android:layout_below="@id/sites"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="15dp"
+            android:background="#FFF" />
+        <TextView
+            android:id="@+id/rating"
+            android:layout_below="@id/view1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:textColor="#fff"
+            android:textSize="21dp"
+            android:textStyle="bold"
+            android:textAllCaps="false"
+            android:textAlignment="center"
+            android:gravity="center_horizontal" />
+        <View
+            android:id="@+id/view2"
+            android:layout_below="@id/rating"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="20dp"
+            android:background="#FFF" />
+        <Button
+            android:layout_width="340dp"
+            android:layout_height="50dp"
+            android:layout_below="@id/view2"
+            android:layout_marginLeft="38dp"
+            android:layout_marginTop="30dp"
+            android:text="Notify about movie release"
+            android:textAllCaps="false"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:background="@drawable/button"/>
 
-    <ImageButton
-        android:id="@+id/imageButton"
-        android:layout_width="50dp"
-        android:layout_below="@id/text_view"
-        android:layout_height="50dp"
-        android:layout_marginStart="180dp"
-        android:layout_marginLeft="100dp"
-        android:scaleType="fitXY"
-        app:srcCompat="@drawable/fav_icon" />
-</RelativeLayout>
+    </RelativeLayout>
+</ScrollView>

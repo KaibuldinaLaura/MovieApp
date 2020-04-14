@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -28,7 +29,10 @@ class LoginActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.registration_page)
+        bindView()
+    }
 
+    private fun bindView() {
         username = findViewById(R.id.loginUsername)
         password = findViewById(R.id.loginPassword)
         buttonReg = findViewById(R.id.buttonReg)
@@ -38,7 +42,10 @@ class LoginActivity : AppCompatActivity() {
                 && password.text.toString().isNotEmpty()
             ) {
                 createToken()
-            } else Toast.makeText(applicationContext, "Please fill each field!", Toast.LENGTH_SHORT)
+            } else Toast.makeText(
+                applicationContext,
+                "Please fill each field!", Toast.LENGTH_SHORT
+            )
                 .show()
         }
     }
@@ -53,7 +60,8 @@ class LoginActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val result = response.body()
                     if (result != null) {
-                        requestedToken = result.getAsJsonPrimitive("request_token")?.asString
+                        requestedToken = result.
+                        getAsJsonPrimitive("request_token")?.asString
                         validationWithLogin()
                     }
                 }
@@ -88,10 +96,12 @@ class LoginActivity : AppCompatActivity() {
             addProperty("password", password.text.toString())
             addProperty("request_token", requestedToken)
         }
-
         RetrofitService.getMovieApi().login(body).enqueue(object : Callback<JsonObject> {
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {
-                Toast.makeText(this@LoginActivity, "Incorrect data", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@LoginActivity,
+                    "Incorrect data", Toast.LENGTH_SHORT
+                ).show()
             }
 
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
@@ -107,14 +117,15 @@ class LoginActivity : AppCompatActivity() {
         })
     }
 
-
     private fun accessActivity() {
-        val myPrefs: SharedPreferences = getSharedPreferences("prefSessionId", Context.MODE_PRIVATE)
+        val myPrefs: SharedPreferences =
+            getSharedPreferences("prefSessionId", Context.MODE_PRIVATE)
         val editor: SharedPreferences.Editor = myPrefs.edit()
         editor.putString("session_id", sessionId)
         editor.apply()
 
         val intent = Intent(baseContext, MainActivity::class.java)
         startActivity(intent)
+        finish()
     }
 }

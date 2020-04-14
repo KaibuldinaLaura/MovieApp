@@ -39,7 +39,7 @@ class FragmentDetails: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        rootView = inflater.inflate(R.layout.fragment_details, container, false)
+        rootView =  inflater.inflate(R.layout.fragment_details, container, false)
         val myPref = context?.getSharedPreferences("prefSessionId", Context.MODE_PRIVATE)
         sessionId = myPref?.getString("session_id", "null").toString()
         return rootView
@@ -47,7 +47,6 @@ class FragmentDetails: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         bindView(view)
         setData()
     }

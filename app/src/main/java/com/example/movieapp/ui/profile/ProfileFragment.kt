@@ -18,13 +18,12 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
-class ProfileFragment: Fragment() {
+class ProfileFragment : Fragment() {
 
-    private lateinit var rootView: View
     private lateinit var pref: SharedPreferences
+    private lateinit var profileName: TextView
+    private lateinit var profileUsername: TextView
     private var sessionId: String? = null
-    lateinit var tvName: TextView
-    lateinit var tvUsername: TextView
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -32,37 +31,45 @@ class ProfileFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        rootView = inflater.inflate(R.layout.fragment_profile, container, false)
-        tvName = rootView.findViewById(R.id.tvName)
-        tvUsername = rootView.findViewById(R.id.tvUsername)
         pref = this.activity?.getSharedPreferences("prefSessionId", MODE_PRIVATE)!!
         sessionId = pref.getString("session_id", "empty")
-        getAccountDetails()
-        return rootView
+        return inflater.inflate(R.layout.fragment_profile, container, false)
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        bindView(view)
+        getAccountDetails()
+    }
+
+    private fun bindView(view: View) = with(view) {
+        profileName = view.findViewById(R.id.profileNmae)
+        profileUsername = view.findViewById(R.id.profileUsername)
+    }
+
     private fun getAccountDetails() {
         Log.d("start", "account")
         try {
             if (sessionId != null) {
-                RetrofitService.getMovieApi()
-                    .getAccountId(sessionId!!)
+                RetrofitService.getMovieApi().getAccountId(sessionId!!)
                     .enqueue(object : Callback<AccountInfo?> {
                         override fun onFailure(call: Call<AccountInfo?>, t: Throwable) {
-                            Log.d("error", "Cannot get account info:(")
+                            Log.e("error", "Cannot get account info:(")
                         }
+
                         @SuppressLint("SetTextI18n")
                         override fun onResponse(
                             call: Call<AccountInfo?>,
                             response: Response<AccountInfo?>
                         ) {
-                            tvName.text = "Name: " + response.body()?.name
-                            tvUsername.text = "Username: " + response.body()?.username
+                            profileName.text = "Name: " + response.body()?.name
+                            profileUsername.text = "Username: " + response.body()?.username
                         }
 
                     })
             }
         } catch (e: Exception) {
-            Log.d("error", e.toString())
+            Log.e("error", e.toString())
         }
     }
 }

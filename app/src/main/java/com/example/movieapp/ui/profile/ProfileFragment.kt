@@ -11,8 +11,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.movieapp.R
-import com.example.movieapp.model.AccountInfo
-import com.example.movieapp.retrofit.RetrofitService
+import com.example.movieapp.model.data.AccountInfo
+import com.example.movieapp.model.network.RetrofitService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -48,14 +48,13 @@ class ProfileFragment: Fragment() {
                     .getAccountId(sessionId!!)
                     .enqueue(object : Callback<AccountInfo?> {
                         override fun onFailure(call: Call<AccountInfo?>, t: Throwable) {
-                            Log.d("fav", "no")
+                            Log.d("error", "Cannot get account info:(")
                         }
                         @SuppressLint("SetTextI18n")
                         override fun onResponse(
                             call: Call<AccountInfo?>,
                             response: Response<AccountInfo?>
                         ) {
-                            Log.d("start", response.body().toString())
                             tvName.text = "Name: " + response.body()?.name
                             tvUsername.text = "Username: " + response.body()?.username
                         }
@@ -63,7 +62,7 @@ class ProfileFragment: Fragment() {
                     })
             }
         } catch (e: Exception) {
-            Log.d("mark",e.toString())
+            Log.d("error", e.toString())
         }
     }
 }

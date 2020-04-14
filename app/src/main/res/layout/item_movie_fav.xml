@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="4dp"
+    android:layout_marginEnd="15dp"
+    android:layout_marginBottom="45dp"
     android:layout_marginRight="8dp"
     android:background="#00203f"
     app:cardBackgroundColor="#00203f"
@@ -14,7 +15,7 @@
     <ImageView
         android:id="@+id/item_movie_image"
         android:layout_width="match_parent"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="15dp"
         android:layout_height="350dp"
         tools:ignore="ContentDescription" />
 
@@ -22,8 +23,8 @@
         android:id="@+id/movie_title"
         android:layout_width="match_parent"
         android:layout_height="25dp"
-        android:layout_marginTop="360dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="370dp"
+        android:layout_marginBottom="15dp"
         android:textAlignment="center"
         android:fontFamily="sans-serif"
         android:textColor="@android:color/white"

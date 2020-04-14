@@ -1,19 +1,22 @@
 package com.example.movieapp.ui.movies
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.movieapp.R
-import com.example.movieapp.model.MovieResponse
-import com.example.movieapp.model.MoviesData
-import com.example.movieapp.retrofit.RetrofitService
-import com.example.movieapp.ui.DetailsActivity
+import com.example.movieapp.base.OnItemClickListener
+import com.example.movieapp.model.data.MovieResponse
+import com.example.movieapp.model.data.MoviesData
+import com.example.movieapp.model.network.RetrofitService
+import com.example.movieapp.ui.movies.adapters.MoviesAdapter
+import com.example.movieapp.ui.movies.adapters.NowPlayingMoviesAdapter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -21,7 +24,10 @@ import retrofit2.Response
 open class MoviesFragment: Fragment() {
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var nowPlayingMoviesRecyclerView: RecyclerView
     private var moviesAdapter: MoviesAdapter? = null
+    private var nowPlayingMoviesAdapter: NowPlayingMoviesAdapter? = null
+    private lateinit var navController: NavController
     private lateinit var rootView: View
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +37,7 @@ open class MoviesFragment: Fragment() {
 
     private fun onCreateComponent() {
         moviesAdapter = MoviesAdapter()
+        nowPlayingMoviesAdapter = NowPlayingMoviesAdapter()
     }
 
     override fun onCreateView(
@@ -46,7 +53,7 @@ open class MoviesFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initView()
-
+        navController = Navigation.findNavController(view)
     }
 
     private fun initView() {
@@ -55,17 +62,19 @@ open class MoviesFragment: Fragment() {
     }
 
     private fun setUpAdapter(){
-        moviesAdapter?.setOnItemClickListener(onItemClickListener = object : OnItemClickListener {
+        moviesAdapter?.setOnItemClickListener(onItemClickListener = object :
+            OnItemClickListener {
             override fun onItemClick(position: Int, view: View) {
-                val intent = Intent(activity, DetailsActivity::class.java)
-                intent.putExtra("movieId", moviesAdapter!!.getItem(position)?.id)
-                startActivity(intent)
+                val bundle = Bundle()
+                moviesAdapter?.getItem(position)?.id?.let { bundle.putInt("movie_id", it) }
+                navController.navigate(R.id.action_moviesFragment_to_fragmentDetails, bundle)
             }
         })
     }
 
     private fun inititializeRecyclerView() {
         recyclerView = rootView.findViewById(R.id.moviesRecyclerView1)
+
         recyclerView.layoutManager = LinearLayoutManager(
             activity,
             LinearLayoutManager.HORIZONTAL,

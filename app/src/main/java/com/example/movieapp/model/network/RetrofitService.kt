@@ -1,11 +1,9 @@
-package com.example.movieapp.retrofit
+package com.example.movieapp.model.network
 
 import android.util.Log
-import com.example.movieapp.model.AccountInfo
-import com.example.movieapp.model.MovieResponse
-import com.example.movieapp.model.MoviesData
-import com.example.movieapp.ui.favourites.FavMovie
-import com.example.movieapp.ui.favourites.FavResponse
+import com.example.movieapp.model.data.AccountInfo
+import com.example.movieapp.model.data.MovieResponse
+import com.example.movieapp.model.data.MoviesData
 import com.google.gson.JsonObject
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -99,12 +97,21 @@ interface MovieApi {
         @Path("movie_id") movieId: Int
     ): Call<MoviesData>
 
-    @Headers("Content-Type:application/json; charset=UTF-8")
-    @POST("account/9178480/favorite?api_key=88f972ac2b5f07d969202c8ffbaaaffa")
-    fun addFavList(@Body movie: FavMovie, @Query("session_id") session: String?): Call<FavResponse>
 
     @GET("account/9178480/favorite/movies?api_key=88f972ac2b5f07d969202c8ffbaaaffa")
     fun getFavList(@Query("session_id") session: String?): Call<MovieResponse>
+
+    @GET("account/{account_id}/favorite/movies")
+    fun getFavoriteMovies(
+        @Query("session_id") sessionId: String,
+        @Query("page") page: Int
+    ) : Call<MovieResponse>
+
+    @POST("account/{account_id}/favorite")
+    fun setMovieMark(
+        @Query("session_id") sessionId: String,
+        @Body body: JsonObject
+    ) : Call<JsonObject>
 }
 
 

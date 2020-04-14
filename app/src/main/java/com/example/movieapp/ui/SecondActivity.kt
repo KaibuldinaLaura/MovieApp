@@ -1,6 +1,6 @@
 package com.example.movieapp.ui
 
-import FavouritesFragment
+import com.example.movieapp.ui.favourites.FavouritesFragment
 import android.os.Bundle
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
@@ -10,7 +10,6 @@ import com.example.movieapp.R
 import com.example.movieapp.ui.movies.MoviesFragment
 import com.example.movieapp.ui.profile.ProfileFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.android.synthetic.main.activity_main.*
 
 class SecondActivity : AppCompatActivity(){
 

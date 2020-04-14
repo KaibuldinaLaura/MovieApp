@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/navigationMovieView"
         android:icon="@drawable/movie_icon"
-        android:title="Movies" />
+        android:title="Movies"
+        tools:ignore="HardcodedText" />
     <item
         android:id="@+id/navigationFavouriteView"
         android:icon="@drawable/fav_icon"
-        android:title="Favourites" />
+        android:title="Favourites"
+        tools:ignore="HardcodedText" />
     <item
         android:id="@+id/navigationProfileView"
         android:icon="@drawable/profile_icon"
-        android:title="Profile" />
+        android:title="Profile"
+        tools:ignore="HardcodedText" />
 </menu>

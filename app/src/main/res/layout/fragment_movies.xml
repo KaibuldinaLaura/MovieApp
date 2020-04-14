@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#00203f"
@@ -13,27 +14,33 @@
        android:fontFamily="sans-serif-medium"
        android:text="Today on screens"
        android:textColor="@android:color/white"
-       android:textSize="27dp"
-       android:textStyle="bold" />
+       android:textSize="27sp"
+       android:textStyle="bold"
+       android:layout_marginStart="10dp"
+       tools:ignore="HardcodedText" />
 
    <LinearLayout
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:orientation="horizontal"
        android:layout_marginTop="210dp"
-       android:layout_marginLeft="260dp">
+       android:layout_marginLeft="260dp"
+       android:layout_marginStart="260dp">
       <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:text="ALL MOVIES"
           android:textColor="@android:color/darker_gray"
-          android:textSize="18dp"
-          android:fontFamily="sans-serif-medium"/>
+          android:textSize="18sp"
+          android:fontFamily="sans-serif-medium"
+          tools:ignore="HardcodedText" />
       <ImageButton
           android:layout_width="24dp"
           android:layout_height="24dp"
           android:layout_marginLeft="10dp"
-          android:src="@drawable/ic_keyboard_arrow_right_black_24dp"/>
+          android:src="@drawable/ic_keyboard_arrow_right_black_24dp"
+          tools:ignore="ContentDescription,PrivateResource"
+          android:layout_marginStart="10dp" />
    </LinearLayout>
    <LinearLayout
        android:layout_width="match_parent"
@@ -46,9 +53,11 @@
           android:layout_marginLeft="10dp"
           android:text="Coming soon"
           android:textColor="@android:color/white"
-          android:textSize="25dp"
+          android:textSize="25sp"
           android:fontFamily="sans-serif"
-          android:textStyle="bold"/>
+          android:textStyle="bold"
+          tools:ignore="HardcodedText"
+          android:layout_marginStart="10dp" />
 
       <TextView
           android:layout_width="wrap_content"
@@ -56,7 +65,9 @@
           android:layout_marginLeft="200dp"
           android:text="ALL"
           android:textColor="@android:color/darker_gray"
-          android:textSize="18dp" />
+          android:textSize="18sp"
+          android:layout_marginStart="200dp"
+          tools:ignore="HardcodedText" />
    </LinearLayout>
 
    <androidx.recyclerview.widget.RecyclerView

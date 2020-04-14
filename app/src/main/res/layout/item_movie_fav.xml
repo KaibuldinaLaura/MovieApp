@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="4dp"
+    android:layout_marginRight="8dp"
+    android:background="#00203f"
+    app:cardBackgroundColor="#00203f"
+    app:cardCornerRadius="4dp"
+    tools:ignore="MissingDefaultResource">
+
+    <ImageView
+        android:id="@+id/item_movie_image"
+        android:layout_width="match_parent"
+        android:layout_marginTop="5dp"
+        android:layout_height="350dp"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/movie_title"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_marginTop="360dp"
+        android:layout_marginBottom="10dp"
+        android:textAlignment="center"
+        android:fontFamily="sans-serif"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center_horizontal" />
+</androidx.cardview.widget.CardView>

@@ -10,12 +10,8 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.movieapp.R
-import com.example.movieapp.login.LoginData
-import com.example.movieapp.login.TokenResponse
-import com.example.movieapp.retrofit.MovieApi
 import com.example.movieapp.retrofit.RetrofitService
-import com.example.movieapp.ui.favourites.RequestSession
-import com.example.movieapp.ui.favourites.SessionId
+import com.google.gson.JsonObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,125 +20,101 @@ import retrofit2.Response
 class MainActivity : AppCompatActivity() {
 
     private lateinit var buttonReg: Button
-    private lateinit var requestedToken: String
-    private lateinit var login: EditText
+    private lateinit var username: EditText
     private lateinit var password: EditText
+    private var requestedToken: String? = null
+    private var sessionId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.registration_page)
 
-        val name: EditText? = findViewById(R.id.editText1)
-        val surname: EditText? = findViewById(R.id.editText2)
-        login = findViewById(R.id.editText3)
-        password = findViewById(R.id.editText4)
+        username = findViewById(R.id.loginUsername)
+        password = findViewById(R.id.loginPassword)
         buttonReg = findViewById(R.id.buttonReg)
 
-        var myPrefs: SharedPreferences
-
         buttonReg.setOnClickListener {
-            if(name?.text.toString().isNotEmpty()
-                && surname?.text.toString().isNotEmpty()
-                && login.text.toString().isNotEmpty()
-                && password.text.toString().isNotEmpty()){
+            if (username.text.toString().isNotEmpty()
+                && password.text.toString().isNotEmpty()
+            ) {
+                createToken()
+            } else Toast.makeText(applicationContext, "Please fill each field!", Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
 
-                myPrefs = getSharedPreferences("prefID", Context.MODE_PRIVATE)
-                val editor: SharedPreferences.Editor = myPrefs.edit()
-                editor.putString("name", name?.text.toString())
-                editor.putString("surname", surname?.text.toString())
-                editor.putString("username", login.text.toString())
-                editor.apply()
-                getToken()
-            } else {
-                Toast.makeText(applicationContext,"Please fill each field!" ,Toast.LENGTH_SHORT).show()
+    private fun createToken() {
+        RetrofitService.getMovieApi().createRequestToken().enqueue(object : Callback<JsonObject> {
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                Log.e("Error", "Cannot create Token")
             }
-        }
 
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                if (response.isSuccessful) {
+                    val result = response.body()
+                    if (result != null) {
+                        requestedToken = result.getAsJsonPrimitive("request_token")?.asString
+                        validationWithLogin()
+                    }
+                }
+            }
+        })
     }
 
-    private fun getToken(){
-        try {
-            val api: MovieApi? = RetrofitService.getClient()?.create(MovieApi::class.java)
-            api?.getRequestToken("88f972ac2b5f07d969202c8ffbaaaffa")
-                ?.enqueue(object : Callback<TokenResponse?> {
-                    override fun onFailure(call: Call<TokenResponse?>, t: Throwable) {
-                        Toast.makeText(this@MainActivity, "Error", Toast.LENGTH_LONG).show()
+    private fun createSessionId() {
+        val body = JsonObject().apply {
+            addProperty("request_token", requestedToken)
+        }
+        RetrofitService.getMovieApi().createSession(body).enqueue(object : Callback<JsonObject> {
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                Log.e("Error", "Cannot create Session Id")
+            }
+
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                if (response.isSuccessful) {
+                    val result = response.body()
+                    if (result != null) {
+                        sessionId = result.getAsJsonPrimitive("session_id")?.asString
+                        accessActivity()
                     }
-                    override fun onResponse(
-                        call: Call<TokenResponse?>,
-                        response: Response<TokenResponse?>
-                    ) {
-                        if (response.body()?.success == true) {
-                            requestedToken = response.body()?.request_token!!
-                            Toast.makeText(this@MainActivity, "Accessed ", Toast.LENGTH_LONG).show()
-                            val intent = Intent( baseContext, SecondActivity::class.java)
-                            startActivity(intent)
-                            getSessionId(requestedToken)
-                            login()
+                }
+            }
+        })
+    }
+
+    private fun validationWithLogin() {
+        val body = JsonObject().apply {
+            addProperty("username", username.text.toString())
+            addProperty("password", password.text.toString())
+            addProperty("request_token", requestedToken)
+        }
+
+        RetrofitService.getMovieApi().login(body).enqueue(object : Callback<JsonObject> {
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                Toast.makeText(this@MainActivity, "Incorrect data", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                if (response.isSuccessful) {
+                    val result = response.body()
+                    if (result != null) {
+                        if (result.getAsJsonPrimitive("success")?.asBoolean!!) {
+                            createSessionId()
                         }
                     }
-                })
-        } catch (e: Exception) {
-            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
-
-        }
+                }
+            }
+        })
     }
-    fun login() {
-        try {
-            val api: MovieApi? = RetrofitService.getClient()?.create(MovieApi::class.java)
-            api?.login(LoginData(login.text.toString(), password.text.toString(), requestedToken))
-                ?.enqueue(object : Callback<TokenResponse?> {
-                    override fun onFailure(call: Call<TokenResponse?>, t: Throwable) {
-                        Toast.makeText(this@MainActivity, "Incorrect data", Toast.LENGTH_SHORT).show()
-                    }
-                    override fun onResponse(
-                        call: Call<TokenResponse?>,
-                        response: Response<TokenResponse?>
-                    ) {
-                        if (response.body()?.success == true) {
-                            Log.d("login", "good")
-                            val intent = Intent( baseContext, SecondActivity::class.java)
-                            startActivity(intent)
-                            getSessionId(requestedToken)
-                        }
-                    }
-                })
-        } catch (e: Exception) {
-            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
 
-        }
-    }
-    fun getSessionId(token: String) {
-        Log.d("start", token)
-        try {
-            val api: MovieApi? = RetrofitService.getClient()?.create(MovieApi::class.java)
-            api?.getSession(SessionId(token))
-                ?.enqueue(object : Callback<RequestSession?> {
-                    override fun onFailure(call: Call<RequestSession?>, t: Throwable) {
-                        Log.d("start", "failure occurred")
-                    }
-                    override fun onResponse(
-                        call: Call<RequestSession?>,
-                        response: Response<RequestSession?>
-                    ) {
-                        if (response.body()?.success == true) {
-                            Toast.makeText(
-                                this@MainActivity,
-                                "getSessionIdResponse",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            Log.d("start", response.body()?.session_id!!)
-                            val myPrefs: SharedPreferences = getSharedPreferences("prefID", Context.MODE_PRIVATE)
-                            val edt = myPrefs.edit()
-                            edt.putString("sessionID", response.body()?.session_id)
-                            edt.apply()
-                        } else
-                            Log.d("start", response.body().toString())
-                    }
-                })
-        } catch (e: Exception) {
-            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show()
-        }
+    private fun accessActivity() {
+        val myPrefs: SharedPreferences = getSharedPreferences("prefSessionId", Context.MODE_PRIVATE)
+        val editor: SharedPreferences.Editor = myPrefs.edit()
+        editor.putString("session_id", sessionId)
+        editor.apply()
+
+        val intent = Intent(baseContext, SecondActivity::class.java)
+        startActivity(intent)
     }
 }

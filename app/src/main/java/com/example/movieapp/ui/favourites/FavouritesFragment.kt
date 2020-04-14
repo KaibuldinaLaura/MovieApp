@@ -14,7 +14,6 @@ import com.example.movieapp.model.MovieResponse
 import com.example.movieapp.model.MoviesData
 import com.example.movieapp.retrofit.RetrofitService
 import com.example.movieapp.ui.DetailsActivity
-import com.example.movieapp.ui.movies.MoviesAdapter
 import com.example.movieapp.ui.movies.OnItemClickListener
 import retrofit2.Call
 import retrofit2.Callback
@@ -23,7 +22,7 @@ import retrofit2.Response
 open class FavouritesFragment: Fragment() {
 
     private lateinit var recyclerView: RecyclerView
-    private var moviesAdapter: MoviesAdapter? = null
+    private var moviesAdapter: FavouritesAdapter? = null
     private lateinit var rootView: View
     private var sessionId: String ?=null
 
@@ -35,7 +34,7 @@ open class FavouritesFragment: Fragment() {
     }
 
     private fun onCreateComponent() {
-        moviesAdapter = MoviesAdapter()
+        moviesAdapter = FavouritesAdapter()
     }
 
     override fun onCreateView(
@@ -44,10 +43,11 @@ open class FavouritesFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val pref =
-            activity!!.getSharedPreferences("prefID", Context.MODE_PRIVATE)
-        sessionId = pref.getString("sessionID", "empty")
+            activity!!.getSharedPreferences("prefSessionId", Context.MODE_PRIVATE)
+        sessionId = pref.getString("session_id", "empty")
         rootView = inflater.inflate(R.layout.fragment_favourites
             , container, false)
+
         return rootView
     }
 
@@ -60,7 +60,7 @@ open class FavouritesFragment: Fragment() {
 
     private fun initView() {
         setUpAdapter()
-        inititializeRecyclerView()
+        initializeRecyclerView()
     }
 
     private fun setUpAdapter(){
@@ -73,7 +73,7 @@ open class FavouritesFragment: Fragment() {
         })
     }
 
-    private fun inititializeRecyclerView() {
+    private fun initializeRecyclerView() {
         recyclerView = rootView.findViewById(R.id.moviesRecyclerView1)
         recyclerView.layoutManager = LinearLayoutManager(
             activity,
@@ -86,6 +86,7 @@ open class FavouritesFragment: Fragment() {
             onSuccess = :: onPopularMoviesFetched,
             onError =  :: onError
         )
+
     }
 
     private fun getPopularMovies(
@@ -93,7 +94,7 @@ open class FavouritesFragment: Fragment() {
         onError: () -> Unit
     ) {
         RetrofitService.getMovieApi().getFavList(sessionId)
-            ?.enqueue(object : Callback<MovieResponse?> {
+            .enqueue(object : Callback<MovieResponse?> {
                 override fun onResponse(
                     call: Call<MovieResponse?>,
                     response: Response<MovieResponse?>

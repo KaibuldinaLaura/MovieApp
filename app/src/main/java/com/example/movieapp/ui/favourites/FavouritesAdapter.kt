@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.movieapp.R
-import com.example.movieapp.model.data.MoviesData
+import com.example.movieapp.data.model.MoviesData
 import com.example.movieapp.base.BaseRecyclerViewAdapter
 
 class FavouritesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
@@ -44,7 +44,5 @@ class FavouritesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
                 itemClickListener?.onItemClick(adapterPosition, v)
             }
         }
-
     }
-
 }

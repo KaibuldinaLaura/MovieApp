@@ -8,13 +8,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.movieapp.R
 import com.example.movieapp.base.BaseRecyclerViewAdapter
-import com.example.movieapp.model.data.MoviesData
+import com.example.movieapp.data.model.MoviesData
 
 class NowPlayingMoviesAdapter : BaseRecyclerViewAdapter<MoviesData>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return NowPlayingMoviesViewHolder(
-            LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_now_playing_movies, parent, false)
+                LayoutInflater.from(parent.context)
+                        .inflate(R.layout.item_now_playing_movies, parent, false)
         )
     }
 
@@ -24,10 +24,9 @@ class NowPlayingMoviesAdapter : BaseRecyclerViewAdapter<MoviesData>() {
     }
 
     inner class NowPlayingMoviesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
-        View.OnClickListener {
-
+            View.OnClickListener {
         private val nowPlayingMovieImage =
-            itemView.findViewById<ImageView>(R.id.nowPlayingMovieImage)
+                itemView.findViewById<ImageView>(R.id.nowPlayingMovieImage)
 
         init {
             nowPlayingMovieImage.setOnClickListener(this)
@@ -35,8 +34,8 @@ class NowPlayingMoviesAdapter : BaseRecyclerViewAdapter<MoviesData>() {
 
         fun bind(moviesData: MoviesData) {
             Glide.with(itemView)
-                .load("https://image.tmdb.org/t/p/w500${moviesData.posterPath}")
-                .into(nowPlayingMovieImage)
+                    .load("https://image.tmdb.org/t/p/w500${moviesData.posterPath}")
+                    .into(nowPlayingMovieImage)
         }
 
         override fun onClick(v: View?) {
@@ -44,6 +43,5 @@ class NowPlayingMoviesAdapter : BaseRecyclerViewAdapter<MoviesData>() {
                 itemClickListener?.onItemClick(adapterPosition, v)
             }
         }
-
     }
 }

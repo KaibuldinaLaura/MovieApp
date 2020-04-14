@@ -1,20 +1,20 @@
 package com.example.movieapp.ui.favourites
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.movieapp.R
-import com.example.movieapp.model.data.MovieResponse
-import com.example.movieapp.model.data.MoviesData
-import com.example.movieapp.model.network.RetrofitService
 import com.example.movieapp.base.OnItemClickListener
-import com.example.movieapp.ui.details.FragmentDetails
+import com.example.movieapp.data.model.MovieResponse
+import com.example.movieapp.data.model.MoviesData
+import com.example.movieapp.data.network.RetrofitService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -22,8 +22,9 @@ import retrofit2.Response
 open class FavouritesFragment: Fragment() {
 
     private lateinit var favouritesRecyclerView: RecyclerView
-    private  var favouriteMoviesAdapter: FavouritesAdapter? = null
     private lateinit var sessionId: String
+    private lateinit var navController: NavController
+    private  var favouriteMoviesAdapter: FavouritesAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,8 +52,9 @@ open class FavouritesFragment: Fragment() {
         setUpAdapter()
     }
 
-    private fun bindView(view: View) = with(view){
-        favouritesRecyclerView = view.findViewById(R.id.moviesRecyclerView1)
+    private fun bindView(view: View) = with(view) {
+        favouritesRecyclerView = view.findViewById(R.id.popularMoviesRecyclerView)
+        navController = Navigation.findNavController(view)
     }
 
     private fun setUpAdapter() {
@@ -62,6 +64,17 @@ open class FavouritesFragment: Fragment() {
             false
         )
         favouritesRecyclerView.adapter = favouriteMoviesAdapter
+
+        favouriteMoviesAdapter?.setOnItemClickListener(onItemClickListener = object :
+            OnItemClickListener {
+            override fun onItemClick(position: Int, view: View) {
+                val bundle = Bundle()
+                favouriteMoviesAdapter?.getItem(position)?.id?.let {
+                    bundle.putInt("movie_id", it)
+                }
+                navController.navigate(R.id.action_favouritesFragment_to_fragmentDetails, bundle)
+            }
+        })
     }
 
     private fun getFavouriteMovies() {

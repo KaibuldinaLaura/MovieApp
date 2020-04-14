@@ -12,9 +12,9 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.movieapp.R
-import com.example.movieapp.model.data.MovieResponse
-import com.example.movieapp.model.data.MoviesData
-import com.example.movieapp.model.network.RetrofitService
+import com.example.movieapp.data.model.MovieResponse
+import com.example.movieapp.data.model.MoviesData
+import com.example.movieapp.data.network.RetrofitService
 import com.google.gson.JsonObject
 import retrofit2.Call
 import retrofit2.Callback
@@ -125,7 +125,7 @@ class FragmentDetails: Fragment() {
             addProperty("favorite", favourite)
         }
         Log.d("1234", favourite.toString())
-        RetrofitService.getMovieApi().setMovieMark(sessionId,body)
+        RetrofitService.getMovieApi().setFavouriteMovies(sessionId,body)
             .enqueue(object : Callback<JsonObject> {
                 override fun onFailure(call: Call<JsonObject>, t: Throwable) {
                     Log.d("Error", "Cannot mark as favourite")

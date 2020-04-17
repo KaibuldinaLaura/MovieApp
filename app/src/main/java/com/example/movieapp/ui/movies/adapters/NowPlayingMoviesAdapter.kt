@@ -44,6 +44,5 @@ class NowPlayingMoviesAdapter : BaseRecyclerViewAdapter<MoviesData>() {
                 itemClickListener?.onItemClick(adapterPosition, v)
             }
         }
-
     }
 }

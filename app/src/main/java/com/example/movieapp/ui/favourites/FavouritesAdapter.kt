@@ -14,7 +14,8 @@ import com.example.movieapp.base.BaseRecyclerViewAdapter
 class FavouritesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return MoviesViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.item_movie_fav, parent, false)
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_movie_fav, parent, false)
         )
     }
 
@@ -23,7 +24,8 @@ class FavouritesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
         getItem(position)?.let { myHolder?.bind(movie = it) }
     }
 
-    inner class MoviesViewHolder (itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class MoviesViewHolder (itemView: View) : RecyclerView.ViewHolder(itemView),
+        View.OnClickListener {
 
         private val movieImageView = itemView.findViewById<ImageView>(R.id.item_movie_image)
         private val movieTitle = itemView.findViewById<TextView>(R.id.movie_title)
@@ -36,6 +38,7 @@ class FavouritesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
             Glide.with(itemView)
                 .load("https://image.tmdb.org/t/p/w342${movie.posterPath}")
                 .into(movieImageView)
+
             movieTitle.text = movie.title
         }
 
@@ -44,7 +47,5 @@ class FavouritesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
                 itemClickListener?.onItemClick(adapterPosition, v)
             }
         }
-
     }
-
 }

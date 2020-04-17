@@ -11,10 +11,11 @@ import com.example.movieapp.R
 import com.example.movieapp.base.BaseRecyclerViewAdapter
 import com.example.movieapp.model.data.MoviesData
 
-class MoviesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
+class PopularMoviesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return MoviesViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.item_movie, parent, false)
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_movie, parent, false)
         )
     }
 
@@ -23,7 +24,8 @@ class MoviesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
         getItem(position)?.let { myHolder?.bind(movie = it) }
     }
 
-    inner class MoviesViewHolder (itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class MoviesViewHolder (itemView: View) : RecyclerView.ViewHolder(itemView),
+        View.OnClickListener {
 
         private val movieImageView = itemView.findViewById<ImageView>(R.id.item_movie_image)
         private val movieTitle = itemView.findViewById<TextView>(R.id.movie_title)
@@ -37,6 +39,7 @@ class MoviesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
             Glide.with(itemView)
                 .load("https://image.tmdb.org/t/p/w342${movie.posterPath}")
                 .into(movieImageView)
+
             movieTitle.text = movie.title
             movieReleaseDate.text = movie.releaseDate
         }
@@ -46,8 +49,6 @@ class MoviesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
                 itemClickListener?.onItemClick(adapterPosition, v)
             }
         }
-
     }
-
 }
 

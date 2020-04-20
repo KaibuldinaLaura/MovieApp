@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -25,6 +26,7 @@ open class FavouritesFragment: Fragment() {
     private  var favouriteMoviesAdapter: FavouritesAdapter? = null
     private lateinit var sessionId: String
     private lateinit var navController: NavController
+    private lateinit var progressBar: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +56,7 @@ open class FavouritesFragment: Fragment() {
     }
 
     private fun bindView(view: View) = with(view){
+        progressBar = view.findViewById(R.id.progressBar)
         favouriteMoviesRecyclerView = view.findViewById(R.id.favouriteMoviesRecyclerView)
         navController = Navigation.findNavController(view)
     }
@@ -83,6 +86,7 @@ open class FavouritesFragment: Fragment() {
         RetrofitService.getMovieApi().getFavoriteMovies(sessionId, page = 1)
             .enqueue(object : Callback<MovieResponse> {
                 override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+                    progressBar.visibility = View.GONE
                     Log.e("Error", "Cannot get Favourite Movies")
                 }
 
@@ -90,6 +94,7 @@ open class FavouritesFragment: Fragment() {
                     call: Call<MovieResponse>,
                     response: Response<MovieResponse>
                 ) {
+                    progressBar.visibility = View.GONE
                     if (response.isSuccessful) {
                         val result = response.body()
                         if (result != null) {

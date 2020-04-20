@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
@@ -22,6 +23,7 @@ import retrofit2.Response
 
 class FragmentDetails: Fragment() {
 
+    private lateinit var progressBar: ProgressBar
     private lateinit var movieImage: ImageView
     private lateinit var movieTitle: TextView
     private lateinit var movieRating: TextView
@@ -52,6 +54,7 @@ class FragmentDetails: Fragment() {
     }
 
     private fun bindView(view: View) = with(view) {
+        progressBar = view.findViewById(R.id.progressBar)
         movieImage = view.findViewById(R.id.movieImageView)
         movieTitle = view.findViewById(R.id.text_view_title)
         movieDescription = view.findViewById(R.id.movieDescription)
@@ -74,9 +77,11 @@ class FragmentDetails: Fragment() {
             .enqueue(object : Callback<MoviesData> {
                 override fun onFailure(call: Call<MoviesData>, t: Throwable) {
                     Log.e("Error", "Cannot get Movie")
+                    progressBar.visibility = View.GONE
                 }
 
                 override fun onResponse(call: Call<MoviesData>, response: Response<MoviesData>) {
+                    progressBar.visibility = View.GONE
                     if (response.isSuccessful) {
                         val result = response.body()
                         if (result != null) {

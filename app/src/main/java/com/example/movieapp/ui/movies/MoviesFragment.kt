@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -24,12 +26,14 @@ import retrofit2.Response
 open class MoviesFragment : Fragment() {
 
     private lateinit var popularMoviesRecyclerView: RecyclerView
+    private lateinit var progressBar: ProgressBar
     private lateinit var nowPlayingMoviesRecyclerView: RecyclerView
     private var popularMoviesAdapter: PopularMoviesAdapter? = null
     private var nowPlayingMoviesAdapter: NowPlayingMoviesAdapter? = null
     private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        (activity as AppCompatActivity).supportActionBar?.hide()
         super.onCreate(savedInstanceState)
         onCreateComponent()
     }
@@ -57,6 +61,7 @@ open class MoviesFragment : Fragment() {
         navController = Navigation.findNavController(view)
         popularMoviesRecyclerView = view.findViewById(R.id.popularMoviesRecyclerView)
         nowPlayingMoviesRecyclerView = view.findViewById(R.id.nowPlayingMoviesRecyclerView)
+        progressBar = view.findViewById(R.id.progressBar)
     }
 
     private fun setUpAdapter() {
@@ -114,6 +119,7 @@ open class MoviesFragment : Fragment() {
                     call: Call<MovieResponse>,
                     response: Response<MovieResponse>
                 ) {
+                    progressBar.visibility = View.GONE
                     if (response.isSuccessful) {
                         val responseBody = response.body()
                         if (responseBody != null) {
@@ -127,6 +133,7 @@ open class MoviesFragment : Fragment() {
                 }
 
                 override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+                    progressBar.visibility = View.GONE
                     onError.invoke()
                 }
             })

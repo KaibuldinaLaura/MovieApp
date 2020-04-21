@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.movieapp.R
@@ -21,6 +22,7 @@ import retrofit2.Response
 class ProfileFragment : Fragment() {
 
     private lateinit var pref: SharedPreferences
+    private lateinit var progressBar: ProgressBar
     private lateinit var profileName: TextView
     private lateinit var profileUsername: TextView
     private var sessionId: String? = null
@@ -45,6 +47,7 @@ class ProfileFragment : Fragment() {
     private fun bindView(view: View) = with(view) {
         profileName = view.findViewById(R.id.profileNmae)
         profileUsername = view.findViewById(R.id.profileUsername)
+        progressBar = view.findViewById(R.id.progressBar)
     }
 
     private fun getAccountDetails() {
@@ -55,6 +58,7 @@ class ProfileFragment : Fragment() {
                     .enqueue(object : Callback<AccountInfo?> {
                         override fun onFailure(call: Call<AccountInfo?>, t: Throwable) {
                             Log.e("error", "Cannot get account info:(")
+                            progressBar.visibility = View.GONE
                         }
 
                         @SuppressLint("SetTextI18n")
@@ -62,6 +66,7 @@ class ProfileFragment : Fragment() {
                             call: Call<AccountInfo?>,
                             response: Response<AccountInfo?>
                         ) {
+                            progressBar.visibility = View.GONE
                             profileName.text = "Name: " + response.body()?.name
                             profileUsername.text = "Username: " + response.body()?.username
                         }

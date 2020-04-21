@@ -12,6 +12,7 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.movieapp.R
 import com.example.movieapp.base.OnItemClickListener
 import com.example.movieapp.model.data.MovieResponse
@@ -26,11 +27,13 @@ import retrofit2.Response
 open class MoviesFragment : Fragment() {
 
     private lateinit var popularMoviesRecyclerView: RecyclerView
-    private lateinit var progressBar: ProgressBar
+    private lateinit var nowPlayingMoviesProgressBar: ProgressBar
+    private lateinit var popularMoviesProgressBar: ProgressBar
     private lateinit var nowPlayingMoviesRecyclerView: RecyclerView
     private var popularMoviesAdapter: PopularMoviesAdapter? = null
     private var nowPlayingMoviesAdapter: NowPlayingMoviesAdapter? = null
     private lateinit var navController: NavController
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         (activity as AppCompatActivity).supportActionBar?.hide()
@@ -61,7 +64,25 @@ open class MoviesFragment : Fragment() {
         navController = Navigation.findNavController(view)
         popularMoviesRecyclerView = view.findViewById(R.id.popularMoviesRecyclerView)
         nowPlayingMoviesRecyclerView = view.findViewById(R.id.nowPlayingMoviesRecyclerView)
-        progressBar = view.findViewById(R.id.progressBar)
+        nowPlayingMoviesProgressBar = view.findViewById(R.id.nowPlayingMoviesProgressBar)
+        popularMoviesProgressBar = view.findViewById(R.id.popularMoviesProgressBar)
+        swipeRefreshLayout = view.findViewById(R.id.moviesFragmentSFL)
+
+        swipeRefreshLayout.setOnRefreshListener {
+            swipeRefreshLayout.isRefreshing = false
+            popularMoviesProgressBar.visibility = View.VISIBLE
+            nowPlayingMoviesProgressBar.visibility = View.VISIBLE
+            popularMoviesAdapter?.clear()
+            nowPlayingMoviesAdapter?.clear()
+            getPopularMovies(
+                onSuccess = ::onPopularMoviesFetched,
+                onError = ::onError
+            )
+            getNowPlayingMovies(
+                onSuccess = ::onNowPlayingMoviesFetched,
+                onError = ::onError
+            )
+        }
     }
 
     private fun setUpAdapter() {
@@ -119,7 +140,7 @@ open class MoviesFragment : Fragment() {
                     call: Call<MovieResponse>,
                     response: Response<MovieResponse>
                 ) {
-                    progressBar.visibility = View.GONE
+                    popularMoviesProgressBar.visibility = View.GONE
                     if (response.isSuccessful) {
                         val responseBody = response.body()
                         if (responseBody != null) {
@@ -133,7 +154,7 @@ open class MoviesFragment : Fragment() {
                 }
 
                 override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                    progressBar.visibility = View.GONE
+                    popularMoviesProgressBar.visibility = View.GONE
                     onError.invoke()
                 }
             })
@@ -150,6 +171,7 @@ open class MoviesFragment : Fragment() {
                     call: Call<MovieResponse>,
                     response: Response<MovieResponse>
                 ) {
+                    nowPlayingMoviesProgressBar.visibility = View.GONE
                     if (response.isSuccessful) {
                         val responseBody = response.body()
                         if (responseBody != null) {
@@ -163,6 +185,7 @@ open class MoviesFragment : Fragment() {
                 }
 
                 override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+                    nowPlayingMoviesProgressBar.visibility = View.GONE
                     onError.invoke()
                 }
             })

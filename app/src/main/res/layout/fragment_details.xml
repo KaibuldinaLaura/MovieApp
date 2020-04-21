@@ -54,6 +54,8 @@
             android:layout_marginTop="20dp"
             android:layout_marginStart="180dp"
             android:layout_marginLeft="100dp"
+            android:background="@drawable/fav_icon"
+            android:backgroundTint="#FFF"
             android:checked="false"
             android:button="@null"
             app:layout_constraintTop_toBottomOf="@id/movieDescription"

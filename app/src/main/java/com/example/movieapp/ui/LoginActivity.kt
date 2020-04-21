@@ -1,5 +1,6 @@
 package com.example.movieapp.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -11,6 +12,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.movieapp.R
+import com.example.movieapp.model.data.AccountInfo
 import com.example.movieapp.model.network.RetrofitService
 import com.google.gson.JsonObject
 import retrofit2.Call
@@ -29,7 +31,37 @@ class LoginActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.registration_page)
-        bindView()
+        val pref = this.getSharedPreferences("prefSessionId", Context.MODE_PRIVATE)!!
+        sessionId = pref.getString("session_id", "null")
+        checkSession()
+    }
+
+    private fun checkSession() {
+        if (sessionId != null) {
+            RetrofitService.getMovieApi().getAccountId(sessionId!!)
+                .enqueue(object : Callback<AccountInfo?> {
+                    override fun onFailure(call: Call<AccountInfo?>, t: Throwable) {
+                        Log.e("error", "Cannot get account info:(")
+                    }
+
+                    @SuppressLint("SetTextI18n")
+                    override fun onResponse(
+                        call: Call<AccountInfo?>,
+                        response: Response<AccountInfo?>
+                    ) {
+                        if (response.isSuccessful) {
+                            val result = response.body()
+                            if (result != null) {
+                                if (result.username != null) {
+                                    accessActivity(2)
+                                }
+                            }
+                        } else {
+                            bindView()
+                        }
+                    }
+                })
+        }
     }
 
     private fun bindView() {
@@ -59,8 +91,7 @@ class LoginActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val result = response.body()
                     if (result != null) {
-                        requestedToken = result.
-                        getAsJsonPrimitive("request_token")?.asString
+                        requestedToken = result.getAsJsonPrimitive("request_token")?.asString
                         validationWithLogin()
                     }
                 }

@@ -45,8 +45,7 @@ class LoginActivity : AppCompatActivity() {
             } else Toast.makeText(
                 applicationContext,
                 "Please fill each field!", Toast.LENGTH_SHORT
-            )
-                .show()
+            ).show()
         }
     }
 
@@ -83,7 +82,7 @@ class LoginActivity : AppCompatActivity() {
                     val result = response.body()
                     if (result != null) {
                         sessionId = result.getAsJsonPrimitive("session_id")?.asString
-                        accessActivity()
+                        accessActivity(1)
                     }
                 }
             }
@@ -117,12 +116,14 @@ class LoginActivity : AppCompatActivity() {
         })
     }
 
-    private fun accessActivity() {
-        val myPrefs: SharedPreferences =
-            getSharedPreferences("prefSessionId", Context.MODE_PRIVATE)
-        val editor: SharedPreferences.Editor = myPrefs.edit()
-        editor.putString("session_id", sessionId)
-        editor.apply()
+    private fun accessActivity(value: Int) {
+        if (value == 1) {
+            val myPrefs: SharedPreferences =
+                getSharedPreferences("prefSessionId", Context.MODE_PRIVATE)
+            val editor: SharedPreferences.Editor = myPrefs.edit()
+            editor.putString("session_id", sessionId)
+            editor.apply()
+        }
 
         val intent = Intent(baseContext, MainActivity::class.java)
         startActivity(intent)

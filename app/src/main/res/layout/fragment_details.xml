@@ -49,18 +49,15 @@
         <CheckBox
             android:id="@+id/imageButton"
             android:layout_width="50dp"
-            android:layout_below="@id/movieDescription"
             android:layout_height="50dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="180dp"
-            android:layout_marginLeft="100dp"
+            android:layout_below="@id/movieDescription"
             android:background="@drawable/fav_icon"
             android:backgroundTint="#FFF"
-            android:checked="false"
             android:button="@null"
-            app:layout_constraintTop_toBottomOf="@id/movieDescription"
-            app:layout_constraintLeft_toLeftOf="parent"
-            />
+            android:checked="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/movieDescription" />
         <TextView
             android:id="@+id/text_view_rating"
             android:layout_marginTop="25dp"

@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.movieapp.R
@@ -24,6 +25,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var buttonReg: Button
     private lateinit var username: EditText
     private lateinit var password: EditText
+    private lateinit var progressBar: ProgressBar
     private var requestedToken: String? = null
     private var sessionId: String? = null
 
@@ -34,6 +36,7 @@ class LoginActivity : AppCompatActivity() {
         val pref = this.getSharedPreferences("prefSessionId", Context.MODE_PRIVATE)!!
         sessionId = pref.getString("session_id", "null")
         checkSession()
+        bindView()
     }
 
     private fun checkSession() {
@@ -56,8 +59,6 @@ class LoginActivity : AppCompatActivity() {
                                     accessActivity(2)
                                 }
                             }
-                        } else {
-                            bindView()
                         }
                     }
                 })
@@ -68,11 +69,14 @@ class LoginActivity : AppCompatActivity() {
         username = findViewById(R.id.loginUsername)
         password = findViewById(R.id.loginPassword)
         buttonReg = findViewById(R.id.buttonReg)
+        progressBar = findViewById(R.id.loginProgressBar)
 
         buttonReg.setOnClickListener {
             if (username.text.toString().isNotEmpty()
                 && password.text.toString().isNotEmpty()
             ) {
+                buttonReg.visibility = View.GONE
+                progressBar.visibility = View.VISIBLE
                 createToken()
             } else Toast.makeText(
                 applicationContext,
@@ -85,6 +89,8 @@ class LoginActivity : AppCompatActivity() {
         RetrofitService.getMovieApi().createRequestToken().enqueue(object : Callback<JsonObject> {
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {
                 Log.e("Error", "Cannot create Token")
+                buttonReg.visibility = View.VISIBLE
+                progressBar.visibility = View.GONE
             }
 
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
@@ -105,6 +111,8 @@ class LoginActivity : AppCompatActivity() {
         }
         RetrofitService.getMovieApi().createSession(body).enqueue(object : Callback<JsonObject> {
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                buttonReg.visibility = View.VISIBLE
+                progressBar.visibility = View.GONE
                 Log.e("Error", "Cannot create Session Id")
             }
 
@@ -128,6 +136,8 @@ class LoginActivity : AppCompatActivity() {
         }
         RetrofitService.getMovieApi().login(body).enqueue(object : Callback<JsonObject> {
             override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                buttonReg.visibility = View.VISIBLE
+                progressBar.visibility = View.GONE
                 Toast.makeText(
                     this@LoginActivity,
                     "Incorrect data", Toast.LENGTH_SHORT
@@ -155,6 +165,8 @@ class LoginActivity : AppCompatActivity() {
             editor.putString("session_id", sessionId)
             editor.apply()
         }
+        buttonReg.visibility = View.VISIBLE
+        progressBar.visibility = View.GONE
 
         val intent = Intent(baseContext, MainActivity::class.java)
         startActivity(intent)

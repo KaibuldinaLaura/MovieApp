@@ -13,6 +13,7 @@ interface MoviesDao  {
     @Query("SELECT * FROM movies_table")
     fun getAllMovies(): List<MoviesData>
 
+<<<<<<< HEAD
     @Query("SELECT * FROM  movies_table WHERE favourite = :favourite")
     fun getFavMovies(favourite: Int): List<MoviesData>
 
@@ -42,5 +43,9 @@ interface MoviesDao  {
 
     @Query("SELECT * FROM movies_table WHERE id = :movieId")
     fun getMovieById(movieId: Int): MoviesData
+=======
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(moviesData: List<MoviesData>?)
+>>>>>>> master
 
 }

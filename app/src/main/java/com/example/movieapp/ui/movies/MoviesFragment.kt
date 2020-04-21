@@ -1,5 +1,10 @@
 package com.example.movieapp.ui.movies
 
+<<<<<<< HEAD
+=======
+import android.app.Application
+import android.content.Intent
+>>>>>>> master
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.movieapp.R
+<<<<<<< HEAD
 import com.example.movieapp.base.OnItemClickListener
 import com.example.movieapp.model.data.MovieResponse
 import com.example.movieapp.model.data.MoviesData
@@ -34,6 +40,35 @@ open class MoviesFragment : Fragment() {
     private var nowPlayingMoviesAdapter: NowPlayingMoviesAdapter? = null
     private lateinit var navController: NavController
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+=======
+import com.example.movieapp.base.OnItemClickListner
+import com.example.movieapp.model.data.MoviesData
+import com.example.movieapp.model.database.MoviesDao
+import com.example.movieapp.model.database.MoviesDatabase
+import com.example.movieapp.model.network.RetrofitService
+import com.example.movieapp.ui.DetailsActivity
+import com.example.movieapp.ui.movies.adapters.MoviesAdapter
+import com.example.movieapp.ui.movies.adapters.NowPlayingMoviesAdapter
+import kotlinx.coroutines.*
+import java.lang.Exception
+import kotlin.coroutines.CoroutineContext
+
+open class MoviesFragment : Fragment() {
+
+    lateinit var recyclerView: RecyclerView
+    lateinit var nowPlayingMoviesRecyclerView: RecyclerView
+    private var moviesAdapter: MoviesAdapter? = null
+    private var nowPlayingMoviesAdapter: NowPlayingMoviesAdapter? = null
+    private lateinit var rootView: View
+    private val job = Job()
+
+    private val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
+
+    private val uiScope: CoroutineScope = CoroutineScope(coroutineContext)
+
+    private var moviesDao: MoviesDao? = null
+>>>>>>> master
 
     override fun onCreate(savedInstanceState: Bundle?) {
         (activity as AppCompatActivity).supportActionBar?.hide()
@@ -42,7 +77,11 @@ open class MoviesFragment : Fragment() {
     }
 
     private fun onCreateComponent() {
+<<<<<<< HEAD
         popularMoviesAdapter = PopularMoviesAdapter()
+=======
+        moviesAdapter = MoviesAdapter()
+>>>>>>> master
         nowPlayingMoviesAdapter = NowPlayingMoviesAdapter()
     }
 
@@ -60,6 +99,7 @@ open class MoviesFragment : Fragment() {
         setUpAdapter()
     }
 
+<<<<<<< HEAD
     private fun bindView(view: View) = with(view) {
         navController = Navigation.findNavController(view)
         popularMoviesRecyclerView = view.findViewById(R.id.popularMoviesRecyclerView)
@@ -87,10 +127,40 @@ open class MoviesFragment : Fragment() {
 
     private fun setUpAdapter() {
         popularMoviesRecyclerView.layoutManager = LinearLayoutManager(
+=======
+
+    private fun setUpAdapter() {
+        moviesAdapter?.setOnItemClickListener(onItemClickListener = object :
+            OnItemClickListner {
+            override fun onItemClick(position: Int, view: View) {
+                val intent = Intent(activity, DetailsActivity::class.java)
+                intent.putExtra("movieId", moviesAdapter!!.getItem(position)?.id)
+                startActivity(intent)
+            }
+        })
+
+        nowPlayingMoviesAdapter?.setOnItemClickListener(onItemClickListener = object :
+            OnItemClickListner {
+            override fun onItemClick(position: Int, view: View) {
+                val intent = Intent(activity, DetailsActivity::class.java)
+                intent.putExtra("movieId", nowPlayingMoviesAdapter!!.getItem(position)?.id)
+                startActivity(intent)
+            }
+        })
+    }
+
+    private fun inititializeRecyclerView() {
+
+        moviesDao = context?.let { MoviesDatabase.getDatabase(context = it)?.moviesDao() }
+
+        recyclerView = rootView.findViewById(R.id.moviesRecyclerView1)
+        recyclerView.layoutManager = LinearLayoutManager(
+>>>>>>> master
             activity,
             LinearLayoutManager.HORIZONTAL,
             false
         )
+<<<<<<< HEAD
         popularMoviesRecyclerView.adapter = popularMoviesAdapter
         nowPlayingMoviesRecyclerView.layoutManager = LinearLayoutManager(
             activity,
@@ -127,13 +197,30 @@ open class MoviesFragment : Fragment() {
             }
         })
 
+=======
+
+
+
+        nowPlayingMoviesRecyclerView = rootView.findViewById(R.id.popularMoviesRecyclerView)
+        nowPlayingMoviesRecyclerView.layoutManager = LinearLayoutManager(
+            activity,
+            LinearLayoutManager.HORIZONTAL,
+            false
+        )
+
+        nowPlayingMoviesRecyclerView.adapter = nowPlayingMoviesAdapter
+        recyclerView.adapter = moviesAdapter
+
+        getPopularMovies()
+
+        getNowPlayingMovies()
+>>>>>>> master
     }
 
-    private fun getPopularMovies(
-        page: Int = 1,
-        onSuccess: (movies: List<MoviesData>) -> Unit,
-        onError: () -> Unit
+    private fun getNowPlayingMovies(
+        page: Int = 1
     ) {
+<<<<<<< HEAD
         RetrofitService.getMovieApi().getPopularMovies(page = page)
             .enqueue(object : Callback<MovieResponse> {
                 override fun onResponse(
@@ -147,11 +234,26 @@ open class MoviesFragment : Fragment() {
                             onSuccess.invoke(responseBody.movies)
                         } else {
                             onError.invoke()
+=======
+        uiScope.launch {
+            val list = withContext(Dispatchers.IO) {
+                try {
+                    val response =
+                        RetrofitService.getMovieApi().getNowPlayingMovieCoroutine(page = page)
+                    if (response.isSuccessful) {
+                        val result = response.body()
+                        if (result != null) {
+                            moviesDao?.insert(result.movies)
+>>>>>>> master
                         }
+                        result?.movies
                     } else {
-                        onError.invoke()
+                        moviesDao?.getAllMovies() ?: emptyList()
                     }
+                } catch (e: Exception) {
+                    moviesDao?.getAllMovies() ?: emptyList<MoviesData>()
                 }
+<<<<<<< HEAD
 
                 override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
                     popularMoviesProgressBar.visibility = View.GONE
@@ -203,5 +305,45 @@ open class MoviesFragment : Fragment() {
 
     private fun onError() {
         Log.e("Error", "Error")
+=======
+            }
+            nowPlayingMoviesAdapter?.addItems(list as ArrayList<MoviesData>)
+        }
+    }
+
+    private fun getPopularMovies(
+        page: Int = 1
+    ) {
+        uiScope.launch {
+            val list = withContext(Dispatchers.IO) {
+                try {
+                    val response =
+                        RetrofitService.getMovieApi().getPopularMoviesCoroutine(page = page)
+                    if (response.isSuccessful) {
+                        val result = response.body()
+                        if (result != null) {
+                            moviesDao?.insert(result.movies)
+                        }
+                        result?.movies
+                    } else {
+                        moviesDao?.getAllMovies() ?: emptyList()
+                    }
+                } catch (e: Exception) {
+                    moviesDao?.getAllMovies() ?: emptyList<MoviesData>()
+                }
+            }
+            moviesAdapter?.addItems(list as ArrayList<MoviesData>)
+        }
+    }
+
+
+    private fun onError() {
+        Log.e("Error", "Error")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel()
+>>>>>>> master
     }
 }

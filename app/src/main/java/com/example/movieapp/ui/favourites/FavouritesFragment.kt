@@ -13,10 +13,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.movieapp.R
+<<<<<<< HEAD
 import com.example.movieapp.base.OnItemClickListener
 import com.example.movieapp.model.data.MovieResponse
 import com.example.movieapp.model.data.MoviesData
 import com.example.movieapp.model.network.RetrofitService
+=======
+import com.example.movieapp.model.data.MovieResponse
+import com.example.movieapp.model.data.MoviesData
+import com.example.movieapp.model.network.RetrofitService
+import com.example.movieapp.ui.DetailsActivity
+import com.example.movieapp.ui.movies.adapters.MoviesAdapter
+import com.example.movieapp.base.OnItemClickListner
+>>>>>>> master
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -57,6 +66,7 @@ open class FavouritesFragment: Fragment() {
         setUpAdapter()
     }
 
+<<<<<<< HEAD
     private fun bindView(view: View) = with(view){
         progressBar = view.findViewById(R.id.progressBar)
         favouriteMoviesRecyclerView = view.findViewById(R.id.favouriteMoviesRecyclerView)
@@ -69,6 +79,17 @@ open class FavouritesFragment: Fragment() {
             favouriteMoviesAdapter?.clear()
             getFavouriteMovies()
         }
+=======
+    private fun setUpAdapter(){
+        moviesAdapter?.setOnItemClickListener(onItemClickListener = object :
+            OnItemClickListner {
+            override fun onItemClick(position: Int, view: View) {
+                val intent = Intent(activity, DetailsActivity::class.java)
+                intent.putExtra("movieId", moviesAdapter!!.getItem(position)?.id)
+                startActivity(intent)
+            }
+        })
+>>>>>>> master
     }
 
     private fun setUpAdapter() {

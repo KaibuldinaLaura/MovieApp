@@ -6,7 +6,11 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.movieapp.model.data.MoviesData
 
+<<<<<<< HEAD
 @Database(entities = [MoviesData::class], version = 1)
+=======
+@Database(entities = [MoviesData::class], version = 2)
+>>>>>>> master
 abstract class MoviesDatabase: RoomDatabase() {
     abstract fun moviesDao(): MoviesDao
 
@@ -21,9 +25,14 @@ abstract class MoviesDatabase: RoomDatabase() {
             INSTANCE = Room.databaseBuilder(
                 context.applicationContext,
                 MoviesDatabase::class.java,
+<<<<<<< HEAD
                 "second_database.db"
             )
                 .fallbackToDestructiveMigration()
+=======
+                "movies_database.db"
+            )
+>>>>>>> master
                 .build()
         }
             return INSTANCE!!

@@ -19,7 +19,11 @@ class NowPlayingMoviesAdapter : BaseRecyclerViewAdapter<MoviesData>() {
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+<<<<<<< HEAD
         val myHolder = holder as NowPlayingMoviesViewHolder
+=======
+        var myHolder = holder as NowPlayingMoviesViewHolder
+>>>>>>> master
         getItem(position)?.let { myHolder.bind(moviesData = it) }
     }
 
@@ -44,5 +48,9 @@ class NowPlayingMoviesAdapter : BaseRecyclerViewAdapter<MoviesData>() {
                 itemClickListener?.onItemClick(adapterPosition, v)
             }
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
     }
 }

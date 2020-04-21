@@ -35,11 +35,13 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.registration_page)
         val pref = this.getSharedPreferences("prefSessionId", Context.MODE_PRIVATE)!!
         sessionId = pref.getString("session_id", "null")
-        checkSession()
         bindView()
+        checkSession()
     }
 
     private fun checkSession() {
+        buttonReg.visibility = View.GONE
+        progressBar.visibility = View.VISIBLE
         if (sessionId != null) {
             RetrofitService.getMovieApi().getAccountId(sessionId!!)
                 .enqueue(object : Callback<AccountInfo?> {
@@ -59,6 +61,9 @@ class LoginActivity : AppCompatActivity() {
                                     accessActivity(2)
                                 }
                             }
+                        } else {
+                            buttonReg.visibility = View.VISIBLE
+                            progressBar.visibility = View.GONE
                         }
                     }
                 })
@@ -83,6 +88,8 @@ class LoginActivity : AppCompatActivity() {
                 "Please fill each field!", Toast.LENGTH_SHORT
             ).show()
         }
+        buttonReg.visibility = View.VISIBLE
+        progressBar.visibility = View.GONE
     }
 
     private fun createToken() {
@@ -100,6 +107,9 @@ class LoginActivity : AppCompatActivity() {
                         requestedToken = result.getAsJsonPrimitive("request_token")?.asString
                         validationWithLogin()
                     }
+                } else {
+                    buttonReg.visibility = View.VISIBLE
+                    progressBar.visibility = View.GONE
                 }
             }
         })
@@ -123,6 +133,9 @@ class LoginActivity : AppCompatActivity() {
                         sessionId = result.getAsJsonPrimitive("session_id")?.asString
                         accessActivity(1)
                     }
+                } else {
+                    buttonReg.visibility = View.VISIBLE
+                    progressBar.visibility = View.GONE
                 }
             }
         })
@@ -152,6 +165,9 @@ class LoginActivity : AppCompatActivity() {
                             createSessionId()
                         }
                     }
+                } else {
+                    buttonReg.visibility = View.VISIBLE
+                    progressBar.visibility = View.GONE
                 }
             }
         })

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -14,12 +15,14 @@ import com.example.movieapp.model.network.RetrofitService
 import com.google.gson.JsonObject
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
+import android.widget.ProgressBar
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var buttonReg: Button
     private lateinit var username: EditText
     private lateinit var password: EditText
+    private lateinit var progressBar: ProgressBar
     private var requestedToken: String? = null
     private var sessionId: String? = null
     private val job = Job()
@@ -38,17 +41,21 @@ class LoginActivity : AppCompatActivity() {
         username = findViewById(R.id.loginUsername)
         password = findViewById(R.id.loginPassword)
         buttonReg = findViewById(R.id.buttonReg)
-
+        progressBar = findViewById(R.id.loginProgressBar)
         buttonReg.setOnClickListener {
             if (username.text.toString().isNotEmpty()
                 && password.text.toString().isNotEmpty()
             ) {
+                buttonReg.visibility = View.GONE
+                progressBar.visibility = View.VISIBLE
                 createToken()
             } else Toast.makeText(
                 applicationContext,
                 "Please fill each field!", Toast.LENGTH_SHORT
             ).show()
         }
+        buttonReg.visibility = View.VISIBLE
+        progressBar.visibility = View.GONE
     }
 
     private fun createToken() {
@@ -67,12 +74,16 @@ class LoginActivity : AppCompatActivity() {
                             validationWithLogin()
                         } else {
                             Log.e("Error", "Cannot create token!")
+
                         }
                     } else {
                         Log.e("Error", "Cannot create token!!")
+
                     }
                 } catch (e: Exception) {
                     Log.e("Error", "Cannot create token!!!")
+                    buttonReg.visibility = View.VISIBLE
+                    progressBar.visibility = View.GONE
                 }
             }
         }
@@ -90,9 +101,7 @@ class LoginActivity : AppCompatActivity() {
                         val result = response.body()
                         if (result != null) {
                             Log.d("Done", "Token Created")
-                            sessionId = result.getAsJsonPrimitive(
-                                "session_id"
-                            )?.asString
+                            sessionId = result.getAsJsonPrimitive("session_id")?.asString
                             accessActivity(1)
                         } else {
                             Log.e("Error", "Cannot create session_id")
@@ -136,15 +145,13 @@ class LoginActivity : AppCompatActivity() {
                         this@LoginActivity,
                         "Incorrect data", Toast.LENGTH_SHORT
                     ).show()
+                    buttonReg.visibility = View.VISIBLE
+                    progressBar.visibility = View.GONE
                 }
             }
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        job.cancel()
-    }
 
     private fun accessActivity(value: Int) {
         if (value == 1) {

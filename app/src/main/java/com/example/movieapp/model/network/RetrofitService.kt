@@ -8,6 +8,7 @@ import com.google.gson.JsonObject
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
@@ -79,14 +80,14 @@ interface MovieApi {
     fun getAccountId(@Query("session_id") sessionId: String): Call<AccountInfo>
 
     @GET("movie/popular")
-    fun getPopularMovies(
+    suspend fun getPopularMovies(
         @Query("page") page: Int
-    ): Call<MovieResponse>
+    ): Response<MovieResponse>
 
     @GET("movie/now_playing")
-    fun getNowPlayingMovies(
+    suspend fun getNowPlayingMovies(
         @Query("page") page: Int
-    ): Call<MovieResponse>
+    ): Response<MovieResponse>
 
     @GET("movie/{movie_id}")
     fun getMovieById(

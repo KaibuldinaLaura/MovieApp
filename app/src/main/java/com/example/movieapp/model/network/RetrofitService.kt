@@ -8,6 +8,7 @@ import com.google.gson.JsonObject
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
@@ -67,13 +68,13 @@ object RetrofitService {
 interface MovieApi {
 
     @POST("authentication/token/validate_with_login")
-    fun login(@Body body: JsonObject): Call<JsonObject>
+    suspend fun login(@Body body: JsonObject): Response<JsonObject>
 
     @POST("authentication/session/new")
-    fun createSession(@Body body: JsonObject): Call<JsonObject>
+    suspend fun createSession(@Body body: JsonObject): Response<JsonObject>
 
     @GET("authentication/token/new")
-    fun createRequestToken(): Call<JsonObject>
+    suspend fun createRequestToken(): Response<JsonObject>
 
     @GET("account")
     fun getAccountId(@Query("session_id") sessionId: String): Call<AccountInfo>

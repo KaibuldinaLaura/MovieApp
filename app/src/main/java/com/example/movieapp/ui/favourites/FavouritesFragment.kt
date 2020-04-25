@@ -1,29 +1,38 @@
-import android.content.Intent
+package com.example.movieapp.ui.favourites
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.movieapp.R
-import com.example.movieapp.model.MovieResponse
-import com.example.movieapp.model.MoviesData
-import com.example.movieapp.retrofit.RetrofitService
-import com.example.movieapp.ui.DetailsActivity
-import com.example.movieapp.ui.movies.MoviesAdapter
-import com.example.movieapp.ui.movies.OnItemClickListner
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.movieapp.base.OnItemClickListener
+import com.example.movieapp.model.data.MoviesData
+import com.example.movieapp.model.database.MoviesDao
+import com.example.movieapp.model.database.MoviesDatabase
+import com.example.movieapp.model.network.RetrofitService
+import kotlinx.coroutines.*
+import java.lang.Exception
+import kotlin.coroutines.CoroutineContext
 
 open class FavouritesFragment: Fragment() {
 
-    lateinit var recyclerView: RecyclerView
-    private var moviesAdapter: MoviesAdapter? = null
-    private lateinit var rootView: View
+    private lateinit var favouriteMoviesRecyclerView: RecyclerView
+    private  var favouriteMoviesAdapter: FavouritesAdapter? = null
+    private lateinit var sessionId: String
+    private lateinit var navController: NavController
+    private val job = Job()
 
+    private val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
+    private val uiScope: CoroutineScope = CoroutineScope(coroutineContext)
+
+    private var moviesDao: MoviesDao? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +40,7 @@ open class FavouritesFragment: Fragment() {
     }
 
     private fun onCreateComponent() {
-        moviesAdapter = MoviesAdapter()
+        favouriteMoviesAdapter = FavouritesAdapter()
     }
 
     override fun onCreateView(
@@ -39,85 +48,74 @@ open class FavouritesFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        rootView = inflater.inflate(R.layout.fragment_favourites
-            , container, false)
-        return rootView
+        val myPref = requireActivity()
+            .getSharedPreferences("prefSessionId", Context.MODE_PRIVATE)
+        sessionId = myPref.getString("session_id", "null").toString()
+        return inflater.inflate(R.layout.fragment_favourites, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        initView()
-
-    }
-
-    private fun initView() {
+        bindView(view)
+        getFavouriteMovies()
         setUpAdapter()
-        inititializeRecyclerView()
     }
 
-    private fun setUpAdapter(){
-        moviesAdapter?.setOnItemClickListener(onItemClickListener = object : OnItemClickListner {
-            override fun onItemClick(position: Int, view: View) {
-                val intent = Intent(activity, DetailsActivity::class.java)
-                intent.putExtra("movieId", moviesAdapter!!.getItem(position)?.id)
-                startActivity(intent)
-            }
-        })
+    private fun bindView(view: View) = with(view){
+        favouriteMoviesRecyclerView = view.findViewById(R.id.favouriteMoviesRecyclerView)
+        navController = Navigation.findNavController(view)
+        moviesDao = context?.let { MoviesDatabase.getDatabase(context = it)?.moviesDao() }
     }
 
-    private fun inititializeRecyclerView() {
-        recyclerView = rootView.findViewById(R.id.moviesRecyclerView1)
-        recyclerView.layoutManager = LinearLayoutManager(
+    private fun setUpAdapter() {
+        favouriteMoviesRecyclerView.layoutManager = LinearLayoutManager(
             activity,
             LinearLayoutManager.VERTICAL,
             false
         )
-        recyclerView.adapter = moviesAdapter
+        favouriteMoviesRecyclerView.adapter = favouriteMoviesAdapter
 
-        getPopularMovies(
-            onSuccess = :: onPopularMoviesFetched,
-            onError =  :: onError
-        )
+        favouriteMoviesAdapter?.setOnItemClickListener(onItemClickListener = object :
+            OnItemClickListener {
+            override fun onItemClick(position: Int, view: View) {
+                val bundle = Bundle()
+                favouriteMoviesAdapter?.getItem(position)?.id?.let {
+                    
+                    bundle.putInt("movie_id", it)
+                }
+                navController.navigate(R.id.action_favouritesFragment_to_fragmentDetails, bundle)
+            }
+        })
     }
 
-    private fun getPopularMovies(
-        page: Int = 1,
-        onSuccess: (movies: List<MoviesData>) -> Unit,
-        onError: () -> Unit
+    private fun getFavouriteMovies(
+        page: Int = 1
     ) {
-        RetrofitService.getMovieApi().getPopularMovies(page = page)
-            .enqueue(object : Callback<MovieResponse> {
-                override fun onResponse(
-                    call: Call<MovieResponse>,
-                    response: Response<MovieResponse>
-                ) {
+        uiScope.launch {
+            val list = withContext(Dispatchers.IO) {
+                try {
+                    val response =
+                        RetrofitService.getMovieApi().getFavoriteMovies(sessionId, page)
                     if (response.isSuccessful) {
-                        val responseBody = response.body()
-
-                        if (responseBody != null) {
-                            onSuccess.invoke(responseBody.movies)
-                        } else {
-                            onError.invoke()
+                        val result = response.body()
+                        result?.movies?.forEach {
+                            if (moviesDao?.getMovieById(it.id) == null) {
+                                moviesDao?.insertItem(it)
+                                moviesDao?.updateFavMovie(favourite = 1, movieId = it.id)
+                            } else {
+                                moviesDao?.updateFavMovie(favourite = 1, movieId = it.id)
+                                Log.d("Fav", moviesDao!!.getMovieById(it.id).toString())
+                            }
                         }
+                        result?.movies
                     } else {
-                        onError.invoke()
+                        moviesDao?.getFavMovies(favourite = 1) ?: emptyList()
                     }
+                } catch (e: Exception) {
+                    moviesDao?.getFavMovies(favourite = 1) ?: emptyList<MoviesData>()
                 }
-                override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                    onError.invoke()
-                }
-            })
+            }
+            favouriteMoviesAdapter?.addItems(list as ArrayList<MoviesData>)
+        }
     }
-
-
-    private fun onPopularMoviesFetched(movies: List<MoviesData>) {
-
-        moviesAdapter?.addItems(movies as ArrayList<MoviesData>)
-    }
-
-    private fun onError() {
-        Log.e("Error", "Error")
-    }
-
 }

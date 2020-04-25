@@ -77,7 +77,8 @@ interface MovieApi {
     suspend fun createRequestToken(): Response<JsonObject>
 
     @GET("account")
-    fun getAccountId(@Query("session_id") sessionId: String): Call<AccountInfo>
+    fun getAccountId(@Query("session_id") sessionId: String
+    ): Response<AccountInfo>
 
     @GET("movie/popular")
     suspend fun getPopularMovies(

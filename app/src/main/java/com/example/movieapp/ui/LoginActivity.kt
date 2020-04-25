@@ -25,8 +25,8 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private var requestedToken: String? = null
     private var sessionId: String? = null
-    private val job = Job()
 
+    private val job = Job()
     private val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
     private val uiScope: CoroutineScope = CoroutineScope(coroutineContext)

@@ -27,4 +27,4 @@ data class MoviesData (
     val nowPlayingMoves: Int,
     @ColumnInfo(name = "popularMovies", defaultValue = "0")
     val popularMovies: Int
-)
+   )

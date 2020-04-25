@@ -34,7 +34,10 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.registration_page)
+        val pref = this.getSharedPreferences("prefSessionId", Context.MODE_PRIVATE)!!
+        sessionId = pref.getString("session_id", "null")
         bindView()
+        checkSession()
     }
 
     private fun bindView() {
@@ -54,8 +57,40 @@ class LoginActivity : AppCompatActivity() {
                 "Please fill each field!", Toast.LENGTH_SHORT
             ).show()
         }
-        buttonReg.visibility = View.VISIBLE
-        progressBar.visibility = View.GONE
+    }
+
+    private fun checkSession() {
+        buttonReg.visibility = View.GONE
+        progressBar.visibility = View.VISIBLE
+        uiScope.launch {
+              withContext(Dispatchers.IO) {
+                try {
+                    val response = sessionId?.let { RetrofitService.getMovieApi().getAccountId(it) }
+                    if (response != null) {
+                        if (response.isSuccessful) {
+                            val result = response.body()
+                            if (result != null) {
+                                if (!result.username.isNullOrEmpty()) {
+                                    accessActivity(2)
+                                } else {
+                                    Log.e("error", "Cannot get account info:(")
+                                }
+                            } else {
+                                Log.e("error", "Cannot get account info:((")
+                            }
+                        } else {
+                            Log.e("error", "Cannot get account info:(((")
+                        }
+                    } else {
+                        Log.e("error", "Cannot get account info:((((")
+                    }
+                } catch (e: Exception) {
+                    Log.e("error", e.toString())
+                }
+            }
+            buttonReg.visibility = View.VISIBLE
+            progressBar.visibility = View.GONE
+        }
     }
 
     private fun createToken() {
@@ -63,7 +98,6 @@ class LoginActivity : AppCompatActivity() {
             withContext(Dispatchers.IO) {
                 try {
                     val response = RetrofitService.getMovieApi().createRequestToken()
-                    Log.d("RES", response.body().toString())
                     if (response.isSuccessful) {
                         val result = response.body()
                         if (result != null) {
@@ -74,18 +108,16 @@ class LoginActivity : AppCompatActivity() {
                             validationWithLogin()
                         } else {
                             Log.e("Error", "Cannot create token!")
-
                         }
                     } else {
                         Log.e("Error", "Cannot create token!!")
-
                     }
                 } catch (e: Exception) {
                     Log.e("Error", "Cannot create token!!!")
-                    buttonReg.visibility = View.VISIBLE
-                    progressBar.visibility = View.GONE
                 }
             }
+            buttonReg.visibility = View.VISIBLE
+            progressBar.visibility = View.GONE
         }
     }
 
@@ -104,15 +136,17 @@ class LoginActivity : AppCompatActivity() {
                             sessionId = result.getAsJsonPrimitive("session_id")?.asString
                             accessActivity(1)
                         } else {
-                            Log.e("Error", "Cannot create session_id")
+                            Log.e("Error", "Cannot create session_id :(")
                         }
                     } else {
-                        Log.e("Error", "Cannot create session_id")
+                        Log.e("Error", "Cannot create session_id :((")
                     }
                 } catch (e: Exception) {
-                    Log.e("Error", "Cannot create session_id")
+                    Log.e("Error",  e.toString())
                 }
             }
+            buttonReg.visibility = View.VISIBLE
+            progressBar.visibility = View.GONE
         }
     }
 
@@ -133,22 +167,18 @@ class LoginActivity : AppCompatActivity() {
                         }
                         if (result?.getAsJsonPrimitive("success")?.asBoolean!!) {
                             createSessionId()
+                        } else {
+                            Log.e("Error", "Cannot validate with login :(")
                         }
                     } else {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "Incorrect data", Toast.LENGTH_SHORT
-                        ).show()
+                        Log.e("Error", "Cannot validate with login :((")
                     }
                 } catch (e: Exception) {
-                    Toast.makeText(
-                        this@LoginActivity,
-                        "Incorrect data", Toast.LENGTH_SHORT
-                    ).show()
-                    buttonReg.visibility = View.VISIBLE
-                    progressBar.visibility = View.GONE
+                    Log.e("Error", e.toString())
                 }
             }
+            buttonReg.visibility = View.VISIBLE
+            progressBar.visibility = View.GONE
         }
     }
 

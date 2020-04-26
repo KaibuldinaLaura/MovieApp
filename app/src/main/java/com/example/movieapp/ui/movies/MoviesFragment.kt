@@ -25,32 +25,26 @@ open class MoviesFragment : Fragment() {
 
     private lateinit var popularMoviesRecyclerView: RecyclerView
     private lateinit var nowPlayingMoviesRecyclerView: RecyclerView
+    private lateinit var nowPlayingMoviesProgressBar: ProgressBar
+    private lateinit var popularMoviesProgressBar: ProgressBar
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private var popularMoviesAdapter: PopularMoviesAdapter? = null
     private var nowPlayingMoviesAdapter: NowPlayingMoviesAdapter? = null
     private lateinit var navController: NavController
+  
     private val job = Job()
-
     private val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
     private val uiScope: CoroutineScope = CoroutineScope(coroutineContext)
 
     private var moviesDao: MoviesDao? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        onCreateComponent()
-    }
-
-    private fun onCreateComponent() {
-        popularMoviesAdapter = PopularMoviesAdapter()
-        nowPlayingMoviesAdapter = NowPlayingMoviesAdapter()
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        (activity as AppCompatActivity).supportActionBar?.hide()
         return inflater.inflate(R.layout.fragment_movies, container, false)
     }
 
@@ -64,9 +58,22 @@ open class MoviesFragment : Fragment() {
         navController = Navigation.findNavController(view)
         popularMoviesRecyclerView = view.findViewById(R.id.popularMoviesRecyclerView)
         nowPlayingMoviesRecyclerView = view.findViewById(R.id.nowPlayingMoviesRecyclerView)
+        nowPlayingMoviesProgressBar = view.findViewById(R.id.nowPlayingMoviesProgressBar)
+        popularMoviesProgressBar = view.findViewById(R.id.popularMoviesProgressBar)
+        swipeRefreshLayout = view.findViewById(R.id.moviesFragmentSFL)
+
         moviesDao = context?.let {
             MoviesDatabase.getDatabase(context = it)
                 ?.moviesDao()
+        }
+        swipeRefreshLayout.setOnRefreshListener {
+            swipeRefreshLayout.isRefreshing = false
+            popularMoviesProgressBar.visibility = View.VISIBLE
+            nowPlayingMoviesProgressBar.visibility = View.VISIBLE
+            popularMoviesAdapter?.clear()
+            nowPlayingMoviesAdapter?.clear()
+            getPopularMovies()
+            getNowPlayingMovies()
         }
     }
 
@@ -76,12 +83,15 @@ open class MoviesFragment : Fragment() {
             LinearLayoutManager.HORIZONTAL,
             false
         )
+        popularMoviesAdapter = PopularMoviesAdapter()
         popularMoviesRecyclerView.adapter = popularMoviesAdapter
+
         nowPlayingMoviesRecyclerView.layoutManager = LinearLayoutManager(
             activity,
             LinearLayoutManager.HORIZONTAL,
             false
         )
+        nowPlayingMoviesAdapter = NowPlayingMoviesAdapter()
         nowPlayingMoviesRecyclerView.adapter = nowPlayingMoviesAdapter
 
         getPopularMovies()
@@ -126,10 +136,11 @@ open class MoviesFragment : Fragment() {
                         moviesDao?.getPopularMovies(1) ?: emptyList()
                     }
                 } catch (e: Exception) {
-                    moviesDao?.getPopularMovies(1) ?: emptyList<MoviesData>()
+                    moviesDao?.getPopularMovies(1) ?: emptyList()
                 }
             }
             popularMoviesAdapter?.addItems(list as ArrayList<MoviesData>)
+            popularMoviesProgressBar.visibility = View.GONE
         }
     }
 
@@ -154,10 +165,11 @@ open class MoviesFragment : Fragment() {
                     }
                 } catch (e: Exception) {
                     popularMoviesAdapter?.clear()
-                    moviesDao?.getNowPlayingMovies(1) ?: emptyList<MoviesData>()
+                    moviesDao?.getNowPlayingMovies(1) ?: emptyList()
                 }
             }
             nowPlayingMoviesAdapter?.addItems(list as ArrayList<MoviesData>)
+            nowPlayingMoviesProgressBar.visibility = View.GONE
         }
     }
 }

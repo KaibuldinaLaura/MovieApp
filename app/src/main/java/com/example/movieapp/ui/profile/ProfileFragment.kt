@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.movieapp.R
 import com.example.movieapp.model.data.AccountInfo
@@ -17,6 +18,7 @@ import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.Exception
 import kotlin.coroutines.CoroutineContext
 
 
@@ -38,6 +40,7 @@ class ProfileFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        (activity as AppCompatActivity).supportActionBar?.hide()
         pref = activity?.getSharedPreferences("prefSessionId", MODE_PRIVATE)!!
         sessionId = pref.getString("session_id", "empty")
         return inflater.inflate(R.layout.fragment_profile, container, false)
@@ -54,27 +57,33 @@ class ProfileFragment : Fragment() {
         profileUsername = view.findViewById(R.id.profileUsername)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun getAccountDetails() {
+        Log.d("start", "account")
         uiScope.launch {
-            try {
-                withContext(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
+                try {
                     val response = sessionId?.let { RetrofitService.getMovieApi().getAccountId(it) }
-                    if (response?.isSuccessful!!) {
-                        val result = response.body()
-                        if (result != null) {
-                            Log.d("Done", "Successfully got Account id")
-                            profileName.text = "Name: " + result.name
-                            profileUsername.text = "Username: " + result?.username
+                    if (response != null) {
+                        if (response.isSuccessful) {
+                            val result = response.body()
+                            if (result != null) {
+                                profileName.text = result.name
+                                profileUsername.text = result.username
+                            } else {
+                                Log.e("error", "Cannot get account info:((")
+                            }
                         } else {
-                            Log.e("Error", "Cannot get Account id")
+                            Log.e("error", "Cannot get account info:(((")
                         }
                     } else {
-                        Log.e("Error", "Cannot get Account id")
+                        Log.e("error", "Cannot get account info:((((")
                     }
+                } catch (e: Exception) {
+                    Log.e("error", e.toString())
                 }
-            } catch (e: Exception) {
-                Log.e("Error", "Cannot get Account id")
             }
+            progressBar.visibility = View.GONE
         }
     }
 }

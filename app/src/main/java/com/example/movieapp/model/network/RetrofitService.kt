@@ -1,4 +1,4 @@
-package com.example.movieapp.model.network
+`package com.example.movieapp.model.network
 
 import android.util.Log
 import com.example.movieapp.model.data.AccountInfo
@@ -79,8 +79,7 @@ interface MovieApi {
     suspend fun createRequestToken(): Response<JsonObject>
 
     @GET("account")
-    suspend fun getAccountId(
-        @Query("session_id") sessionId: String
+    suspend fun getAccountId(@Query("session_id") sessionId: String
     ): Response<AccountInfo>
 
     @GET("movie/popular")

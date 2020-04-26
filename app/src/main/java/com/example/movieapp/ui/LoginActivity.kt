@@ -19,6 +19,9 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.lang.Exception
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.CoroutineContext
+import android.widget.ProgressBar
+
 
 class LoginActivity : AppCompatActivity() {
 
@@ -33,17 +36,23 @@ class LoginActivity : AppCompatActivity() {
         get() = Dispatchers.Main + job
     private val uiScope: CoroutineScope = CoroutineScope(coroutineContext)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    private val job = Job()
+    private val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
+    private val uiScope: CoroutineScope = CoroutineScope(coroutineContext)
 
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.registration_page)
         bindView()
+        checkSession()
     }
 
     private fun bindView() {
         username = findViewById(R.id.loginUsername)
         password = findViewById(R.id.loginPassword)
         buttonReg = findViewById(R.id.buttonReg)
+        progressBar = findViewById(R.id.loginProgressBar)
 
         buttonReg.setOnClickListener {
             if (username.text.toString().isNotEmpty()
@@ -54,6 +63,40 @@ class LoginActivity : AppCompatActivity() {
                 applicationContext,
                 "Please fill each field!", Toast.LENGTH_SHORT
             ).show()
+        }
+    }
+
+    private fun checkSession() {
+        buttonReg.visibility = View.GONE
+        progressBar.visibility = View.VISIBLE
+        uiScope.launch {
+              withContext(Dispatchers.IO) {
+                try {
+                    val response = sessionId?.let { RetrofitService.getMovieApi().getAccountId(it) }
+                    if (response != null) {
+                        if (response.isSuccessful) {
+                            val result = response.body()
+                            if (result != null) {
+                                if (!result.username.isNullOrEmpty()) {
+                                    accessActivity(2)
+                                } else {
+                                    Log.e("error", "Cannot get account info:(")
+                                }
+                            } else {
+                                Log.e("error", "Cannot get account info:((")
+                            }
+                        } else {
+                            Log.e("error", "Cannot get account info:(((")
+                        }
+                    } else {
+                        Log.e("error", "Cannot get account info:((((")
+                    }
+                } catch (e: Exception) {
+                    Log.e("error", e.toString())
+                }
+            }
+            buttonReg.visibility = View.VISIBLE
+            progressBar.visibility = View.GONE
         }
     }
 
@@ -71,15 +114,17 @@ class LoginActivity : AppCompatActivity() {
                             )?.asString
                             validationWithLogin()
                         } else {
-                            Log.e("Error", "Cannot create token")
+                            Log.e("Error", "Cannot create token!")
                         }
                     } else {
-                        Log.e("Error", "Cannot create token")
+                        Log.e("Error", "Cannot create token!!")
                     }
                 } catch (e: Exception) {
-                    Log.e("Error", "Cannot create token")
+                    Log.e("Error", "Cannot create token!!!")
                 }
             }
+            buttonReg.visibility = View.VISIBLE
+            progressBar.visibility = View.GONE
         }
     }
 
@@ -95,20 +140,20 @@ class LoginActivity : AppCompatActivity() {
                         val result = response.body()
                         if (result != null) {
                             Log.d("Done", "Token Created")
-                            sessionId = result.getAsJsonPrimitive(
-                                "session_id"
-                            )?.asString
+                            sessionId = result.getAsJsonPrimitive("session_id")?.asString
                             accessActivity(1)
                         } else {
-                            Log.e("Error", "Cannot create session_id")
+                            Log.e("Error", "Cannot create session_id :(")
                         }
                     } else {
-                        Log.e("Error", "Cannot create session_id")
+                        Log.e("Error", "Cannot create session_id :((")
                     }
                 } catch (e: Exception) {
-                    Log.e("Error", "Cannot create session_id")
+                    Log.e("Error",  e.toString())
                 }
             }
+            buttonReg.visibility = View.VISIBLE
+            progressBar.visibility = View.GONE
         }
     }
 
@@ -129,22 +174,21 @@ class LoginActivity : AppCompatActivity() {
                         }
                         if (result?.getAsJsonPrimitive("success")?.asBoolean!!) {
                             createSessionId()
+                        } else {
+                            Log.e("Error", "Cannot validate with login :(")
                         }
                     } else {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "Incorrect data", Toast.LENGTH_SHORT
-                        ).show()
+                        Log.e("Error", "Cannot validate with login :((")
                     }
                 } catch (e: Exception) {
-                    Toast.makeText(
-                        this@LoginActivity,
-                        "Incorrect data", Toast.LENGTH_SHORT
-                    ).show()
+                    Log.e("Error", e.toString())
                 }
             }
+            buttonReg.visibility = View.VISIBLE
+            progressBar.visibility = View.GONE
         }
     }
+
 
     private fun accessActivity(value: Int) {
         if (value == 1) {

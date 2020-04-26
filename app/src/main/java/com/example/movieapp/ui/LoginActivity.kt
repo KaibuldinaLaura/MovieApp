@@ -35,6 +35,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.registration_page)
+        this.supportActionBar.hide()
         val pref = this.getSharedPreferences("prefSessionId", Context.MODE_PRIVATE)!!
         sessionId = pref.getString("session_id", "null")
         bindView()

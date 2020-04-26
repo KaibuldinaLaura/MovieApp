@@ -1,4 +1,4 @@
-package com.example.movieapp.model.network
+`package com.example.movieapp.model.network
 
 import android.util.Log
 import com.example.movieapp.model.data.AccountInfo
@@ -68,10 +68,12 @@ object RetrofitService {
 interface MovieApi {
 
     @POST("authentication/token/validate_with_login")
-    suspend fun login(@Body body: JsonObject): Response<JsonObject>
+    suspend fun login(@Body body: JsonObject
+    ): Response<JsonObject>
 
     @POST("authentication/session/new")
-    suspend fun createSession(@Body body: JsonObject): Response<JsonObject>
+    suspend fun createSession(@Body body: JsonObject
+    ): Response<JsonObject>
 
     @GET("authentication/token/new")
     suspend fun createRequestToken(): Response<JsonObject>
@@ -91,21 +93,21 @@ interface MovieApi {
     ): Response<MovieResponse>
 
     @GET("movie/{movie_id}")
-    fun getMovieById(
+    suspend fun getMovieById(
         @Path("movie_id") movieId: Int
-    ): Call<MoviesData>
+    ): Response<MoviesData>
 
     @GET("account/{account_id}/favorite/movies")
-    fun getFavoriteMovies(
+    suspend fun getFavoriteMovies(
         @Query("session_id") sessionId: String,
         @Query("page") page: Int
-    ) : Call<MovieResponse>
+    ) : Response<MovieResponse>
 
     @POST("account/{account_id}/favorite")
-    fun setMovieMark(
+    suspend fun setMovieMark(
         @Query("session_id") sessionId: String,
         @Body body: JsonObject
-    ) : Call<JsonObject>
+    ) : Response<JsonObject>
 }
 
 

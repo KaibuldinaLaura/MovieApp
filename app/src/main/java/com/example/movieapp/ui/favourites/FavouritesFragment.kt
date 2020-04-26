@@ -13,15 +13,15 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.movieapp.R
 import com.example.movieapp.base.OnItemClickListener
-import com.example.movieapp.model.data.MovieResponse
 import com.example.movieapp.model.data.MoviesData
+import com.example.movieapp.model.database.MoviesDao
+import com.example.movieapp.model.database.MoviesDatabase
 import com.example.movieapp.model.network.RetrofitService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.*
+import java.lang.Exception
+import kotlin.coroutines.CoroutineContext
 
 open class FavouritesFragment : Fragment() {
 
@@ -29,8 +29,13 @@ open class FavouritesFragment : Fragment() {
     private var favouriteMoviesAdapter: FavouritesAdapter? = null
     private lateinit var sessionId: String
     private lateinit var navController: NavController
-    private lateinit var progressBar: ProgressBar
-    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private val job = Job()
+
+    private val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
+    private val uiScope: CoroutineScope = CoroutineScope(coroutineContext)
+
+    private var moviesDao: MoviesDao? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,18 +56,12 @@ open class FavouritesFragment : Fragment() {
         setUpAdapter()
     }
 
-    private fun bindView(view: View) = with(view) {
+
+    private fun bindView(view: View) = with(view){
         progressBar = view.findViewById(R.id.progressBar)
         favouriteMoviesRecyclerView = view.findViewById(R.id.favouriteMoviesRecyclerView)
         navController = Navigation.findNavController(view)
-        swipeRefreshLayout = findViewById(R.id.favouritesFragmentSFL)
-
-        swipeRefreshLayout.setOnRefreshListener {
-            swipeRefreshLayout.isRefreshing = false
-            progressBar.visibility = View.VISIBLE
-            favouriteMoviesAdapter?.clear()
-            getFavouriteMovies()
-        }
+        moviesDao = context?.let { MoviesDatabase.getDatabase(context = it)?.moviesDao() }
     }
 
     private fun setUpAdapter() {
@@ -86,28 +85,34 @@ open class FavouritesFragment : Fragment() {
         })
     }
 
-    private fun getFavouriteMovies() {
-        favouriteMoviesAdapter?.clear()
-        RetrofitService.getMovieApi().getFavoriteMovies(sessionId, page = 1)
-            .enqueue(object : Callback<MovieResponse> {
-                override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                    progressBar.visibility = View.GONE
-                    Log.e("Error", "Cannot get Favourite Movies")
-                }
-
-                override fun onResponse(
-                    call: Call<MovieResponse>,
-                    response: Response<MovieResponse>
-                ) {
-                    progressBar.visibility = View.GONE
+    private fun getFavouriteMovies(
+        page: Int = 1
+    ) {
+        uiScope.launch {
+            val list = withContext(Dispatchers.IO) {
+                try {
+                    val response =
+                        RetrofitService.getMovieApi().getFavoriteMovies(sessionId, page)
                     if (response.isSuccessful) {
                         val result = response.body()
-                        if (result != null) {
-                            favouriteMoviesAdapter
-                                ?.addItems(result.movies as ArrayList<MoviesData>)
+                        result?.movies?.forEach {
+                            if (moviesDao?.getMovieById(it.id) == null) {
+                                moviesDao?.insertItem(it)
+                                moviesDao?.updateFavMovie(favourite = 1, movieId = it.id)
+                            } else {
+                                moviesDao?.updateFavMovie(favourite = 1, movieId = it.id)
+                                Log.d("Fav", moviesDao!!.getMovieById(it.id).toString())
+                            }
                         }
+                        result?.movies
+                    } else {
+                        moviesDao?.getFavMovies(favourite = 1) ?: emptyList()
                     }
+                } catch (e: Exception) {
+                    moviesDao?.getFavMovies(favourite = 1) ?: emptyList<MoviesData>()
                 }
-            })
+            }
+            favouriteMoviesAdapter?.addItems(list as ArrayList<MoviesData>)
+        }
     }
 }

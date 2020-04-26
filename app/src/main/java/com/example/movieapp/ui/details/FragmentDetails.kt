@@ -8,23 +8,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.movieapp.R
-import com.example.movieapp.model.data.MovieResponse
 import com.example.movieapp.model.data.MoviesData
+import com.example.movieapp.model.database.MoviesDao
+import com.example.movieapp.model.database.MoviesDatabase
 import com.example.movieapp.model.network.RetrofitService
 import com.google.gson.JsonObject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.*
+import java.lang.Exception
+import kotlin.coroutines.CoroutineContext
 
-class FragmentDetails: Fragment() {
+class FragmentDetails : Fragment() {
 
-    private lateinit var progressBar: ProgressBar
     private lateinit var movieImage: ImageView
     private lateinit var movieTitle: TextView
     private lateinit var movieRating: TextView
@@ -35,6 +34,13 @@ class FragmentDetails: Fragment() {
     private var favButtonState = false
     private var movieId: Int? = 0
     private lateinit var sessionId: String
+
+    private val job = Job()
+    private val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
+    private val uiScope: CoroutineScope = CoroutineScope(coroutineContext)
+
+    private var moviesDao: MoviesDao? = null
 
 
     override fun onCreateView(
@@ -56,15 +62,18 @@ class FragmentDetails: Fragment() {
     }
 
     private fun bindView(view: View) = with(view) {
-        progressBar = view.findViewById(R.id.progressBar)
         movieImage = view.findViewById(R.id.movieImageView)
         movieTitle = view.findViewById(R.id.text_view_title)
         movieDescription = view.findViewById(R.id.movieDescription)
         movieRating = view.findViewById(R.id.rating)
         favouriteButton = view.findViewById(R.id.imageButton)
         movieId = arguments?.getInt("movie_id")
+        moviesDao = context?.let {
+            MoviesDatabase.getDatabase(context = it)
+                ?.moviesDao()
+        }
 
-        favouriteButton.setOnClickListener{
+        favouriteButton.setOnClickListener {
             setFavouriteMovies(!favButtonState)
         }
     }
@@ -75,23 +84,26 @@ class FragmentDetails: Fragment() {
     }
 
     private fun getMovieById() {
-        movieId?.let { RetrofitService.getMovieApi().getMovieById(it)
-            .enqueue(object : Callback<MoviesData> {
-                override fun onFailure(call: Call<MoviesData>, t: Throwable) {
-                    Log.e("Error", "Cannot get Movie")
-                    progressBar.visibility = View.GONE
-                }
-
-                override fun onResponse(call: Call<MoviesData>, response: Response<MoviesData>) {
-                    progressBar.visibility = View.GONE
-                    if (response.isSuccessful) {
+        uiScope.launch {
+            val list = withContext(Dispatchers.IO) {
+                try {
+                    val response =
+                        movieId?.let { RetrofitService.getMovieApi().getMovieById(it) }
+                    if (response?.isSuccessful!!) {
                         val result = response.body()
                         if (result != null) {
-                            initView(result)
+                            Log.d("Done", "Successfully got Movie by Id")
                         }
+                        result
+                    } else {
+                        movieId?.let { moviesDao?.getMovieById(it) }
                     }
+                } catch (e: Exception) {
+                    movieId?.let { moviesDao?.getMovieById(it) }
                 }
-            }) }
+            }
+            initView(list as MoviesData)
+        }
     }
 
     private fun initView(moviesData: MoviesData) {
@@ -104,56 +116,67 @@ class FragmentDetails: Fragment() {
     }
 
     private fun getFavouriteMovies() {
-        RetrofitService.getMovieApi().getFavoriteMovies(sessionId, 1)
-            .enqueue(object : Callback<MovieResponse> {
-            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                Log.e("Error", "Cannot get Favourite Movies")
-            }
-
-            override fun onResponse(
-                call: Call<MovieResponse>,
-                response: Response<MovieResponse>
-            ) {
-                if (response.isSuccessful) {
-                    val result = response.body()
-                    if (result != null) {
-                        favList = result.movies
-                        checkFavList()
+        uiScope.launch {
+            val list = withContext(Dispatchers.IO) {
+                try {
+                    val response =
+                        RetrofitService.getMovieApi().getFavoriteMovies(sessionId, 1)
+                    if (response.isSuccessful) {
+                        val result = response.body()
+                        result?.movies?.forEach {
+                            moviesDao?.updateFavMovie(favourite = 1, movieId = it.id)
+                        }
+                        result?.movies
+                    } else {
+                        moviesDao?.getFavMovies(1) ?: emptyList()
                     }
+                } catch (e: Exception) {
+                    moviesDao?.getFavMovies(1) ?: emptyList<MoviesData>()
                 }
             }
-        })
+            favList = list as ArrayList<MoviesData>
+            checkFavList()
+        }
     }
+
     private fun setFavouriteMovies(favourite: Boolean) {
         val body = JsonObject().apply {
             addProperty("media_type", "movie")
             addProperty("media_id", movieId)
             addProperty("favorite", favourite)
         }
-        Log.d("1234", favourite.toString())
-        RetrofitService.getMovieApi().setMovieMark(sessionId,body)
-            .enqueue(object : Callback<JsonObject> {
-                override fun onFailure(call: Call<JsonObject>, t: Throwable) {
-                    Log.d("Error", "Cannot mark as favourite")
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val response =
+                        RetrofitService.getMovieApi().setMovieMark(sessionId, body)
+                    if (response.isSuccessful) {
+                        val fav: Int = if (favourite) {
+                            1
+                        } else {
+                            0
+                        }
+                        movieId?.let { moviesDao?.updateFavMovie(fav, movieId = it) }
+                        getFavouriteMovies()
+                    } else {
+                        Log.e("Error", "Cannot mark as favourite")
+                    }
+                } catch (e: Exception) {
+                    Log.e("Error", "Cannot mark as favourite")
                 }
-
-                override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
-                   if (response.isSuccessful) {
-                       getFavouriteMovies()
-                   }
-                }
-            })
+            }
+        }
     }
 
     private fun checkFavList() {
         favList.forEach {
-          if (it.id == movieId){
+            if (it.id == movieId) {
                 favouriteButton.setBackgroundResource(R.drawable.favicon)
                 favButtonState = true
                 return
             }
         }
         favouriteButton.setBackgroundResource(R.drawable.fav_icon)
-        favButtonState  = false
+        favButtonState = false
     }
 }

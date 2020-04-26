@@ -71,8 +71,8 @@ class ProfileFragment : Fragment() {
                         if (response.isSuccessful) {
                             val result = response.body()
                             if (result != null) {
-                                profileName.text = result.name
-                                profileUsername.text = result.username
+                                profileName.text = "Name: " + result.name
+                                profileUsername.text = "Username: " + result.username
                             } else {
                                 Log.e("error", "Cannot get account info:((")
                             }

@@ -13,6 +13,7 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.movieapp.R
 import com.example.movieapp.base.OnItemClickListener
 import com.example.movieapp.model.data.MoviesData
@@ -30,6 +31,7 @@ open class FavouritesFragment : Fragment() {
     private lateinit var sessionId: String
     private lateinit var navController: NavController
     private lateinit var progressBar: ProgressBar
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private val job = Job()
     private val coroutineContext: CoroutineContext
@@ -61,7 +63,15 @@ open class FavouritesFragment : Fragment() {
         progressBar = view.findViewById(R.id.progressBar)
         favouriteMoviesRecyclerView = view.findViewById(R.id.favouriteMoviesRecyclerView)
         navController = Navigation.findNavController(view)
+        swipeRefreshLayout = findViewById(R.id.favouritesFragmentSFL)
+
         moviesDao = context?.let { MoviesDatabase.getDatabase(context = it)?.moviesDao() }
+        swipeRefreshLayout.setOnRefreshListener {
+            swipeRefreshLayout.isRefreshing = false
+            progressBar.visibility = View.VISIBLE
+            favouriteMoviesAdapter?.clear()
+            getFavouriteMovies()
+        }
     }
 
     private fun setUpAdapter() {

@@ -8,6 +8,7 @@ import com.google.gson.JsonObject
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
@@ -67,43 +68,46 @@ object RetrofitService {
 interface MovieApi {
 
     @POST("authentication/token/validate_with_login")
-    fun login(@Body body: JsonObject): Call<JsonObject>
+    suspend fun login(@Body body: JsonObject
+    ): Response<JsonObject>
 
     @POST("authentication/session/new")
-    fun createSession(@Body body: JsonObject): Call<JsonObject>
+    suspend fun createSession(@Body body: JsonObject
+    ): Response<JsonObject>
 
     @GET("authentication/token/new")
-    fun createRequestToken(): Call<JsonObject>
+    suspend fun createRequestToken(): Response<JsonObject>
 
     @GET("account")
-    fun getAccountId(@Query("session_id") sessionId: String): Call<AccountInfo>
+    suspend fun getAccountId(@Query("session_id") sessionId: String
+    ): Response<AccountInfo>
 
     @GET("movie/popular")
-    fun getPopularMovies(
+    suspend fun getPopularMovies(
         @Query("page") page: Int
-    ): Call<MovieResponse>
+    ): Response<MovieResponse>
 
     @GET("movie/now_playing")
-    fun getNowPlayingMovies(
+    suspend fun getNowPlayingMovies(
         @Query("page") page: Int
-    ): Call<MovieResponse>
+    ): Response<MovieResponse>
 
     @GET("movie/{movie_id}")
-    fun getMovieById(
+    suspend fun getMovieById(
         @Path("movie_id") movieId: Int
-    ): Call<MoviesData>
+    ): Response<MoviesData>
 
     @GET("account/{account_id}/favorite/movies")
-    fun getFavoriteMovies(
+    suspend fun getFavoriteMovies(
         @Query("session_id") sessionId: String,
         @Query("page") page: Int
-    ) : Call<MovieResponse>
+    ) : Response<MovieResponse>
 
     @POST("account/{account_id}/favorite")
-    fun setMovieMark(
+    suspend fun setMovieMark(
         @Query("session_id") sessionId: String,
         @Body body: JsonObject
-    ) : Call<JsonObject>
+    ) : Response<JsonObject>
 }
 
 

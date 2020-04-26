@@ -10,22 +10,31 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.movieapp.R
 import com.example.movieapp.model.data.AccountInfo
 import com.example.movieapp.model.network.RetrofitService
+import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.Exception
+import kotlin.coroutines.CoroutineContext
 
 
 class ProfileFragment : Fragment() {
 
     private lateinit var pref: SharedPreferences
-    private lateinit var progressBar: ProgressBar
     private lateinit var profileName: TextView
     private lateinit var profileUsername: TextView
+    private lateinit var progressBar: ProgressBar
     private var sessionId: String? = null
+
+    private val job = Job()
+    private val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
+    private val uiScope: CoroutineScope = CoroutineScope(coroutineContext)
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -33,7 +42,8 @@ class ProfileFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        pref = this.activity?.getSharedPreferences("prefSessionId", MODE_PRIVATE)!!
+        (activity as AppCompatActivity).supportActionBar?.hide()
+        pref = activity?.getSharedPreferences("prefSessionId", MODE_PRIVATE)!!
         sessionId = pref.getString("session_id", "empty")
         return inflater.inflate(R.layout.fragment_profile, container, false)
     }
@@ -50,31 +60,33 @@ class ProfileFragment : Fragment() {
         progressBar = view.findViewById(R.id.progressBar)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun getAccountDetails() {
         Log.d("start", "account")
-        try {
-            if (sessionId != null) {
-                RetrofitService.getMovieApi().getAccountId(sessionId!!)
-                    .enqueue(object : Callback<AccountInfo?> {
-                        override fun onFailure(call: Call<AccountInfo?>, t: Throwable) {
-                            Log.e("error", "Cannot get account info:(")
-                            progressBar.visibility = View.GONE
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val response = sessionId?.let { RetrofitService.getMovieApi().getAccountId(it) }
+                    if (response != null) {
+                        if (response.isSuccessful) {
+                            val result = response.body()
+                            if (result != null) {
+                                profileName.text = result.name
+                                profileUsername.text = result.username
+                            } else {
+                                Log.e("error", "Cannot get account info:((")
+                            }
+                        } else {
+                            Log.e("error", "Cannot get account info:(((")
                         }
-
-                        @SuppressLint("SetTextI18n")
-                        override fun onResponse(
-                            call: Call<AccountInfo?>,
-                            response: Response<AccountInfo?>
-                        ) {
-                            progressBar.visibility = View.GONE
-                            profileName.text = "Name: " + response.body()?.name
-                            profileUsername.text = "Username: " + response.body()?.username
-                        }
-
-                    })
+                    } else {
+                        Log.e("error", "Cannot get account info:((((")
+                    }
+                } catch (e: Exception) {
+                    Log.e("error", e.toString())
+                }
             }
-        } catch (e: Exception) {
-            Log.e("error", e.toString())
+            progressBar.visibility = View.GONE
         }
     }
 }

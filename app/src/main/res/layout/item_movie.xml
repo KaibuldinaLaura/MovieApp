@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="128dp"
-    android:layout_height="225dp"
+    android:layout_height="205dp"
     android:layout_marginEnd="4dp"
     android:layout_marginRight="8dp"
     android:background="#00203f"
@@ -14,14 +14,14 @@
     <ImageView
         android:id="@+id/item_movie_image"
         android:layout_width="match_parent"
-        android:layout_height="160dp"
+        android:layout_height="140dp"
         tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/movie_title"
         android:layout_width="match_parent"
         android:layout_height="25dp"
-        android:layout_marginTop="165dp"
+        android:layout_marginTop="145dp"
         android:layout_marginLeft="8dp"
         android:fontFamily="sans-serif"
         android:textColor="@android:color/white"
@@ -32,7 +32,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="199dp"
+        android:layout_marginTop="179dp"
         tools:ignore="UseCompoundDrawables">
 
         <ImageView

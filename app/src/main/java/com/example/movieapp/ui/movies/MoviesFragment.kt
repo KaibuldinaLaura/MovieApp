@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.movieapp.R
 import com.example.movieapp.base.OnItemClickListener
 import com.example.movieapp.model.data.MoviesData
@@ -61,11 +64,11 @@ open class MoviesFragment : Fragment() {
         nowPlayingMoviesProgressBar = view.findViewById(R.id.nowPlayingMoviesProgressBar)
         popularMoviesProgressBar = view.findViewById(R.id.popularMoviesProgressBar)
         swipeRefreshLayout = view.findViewById(R.id.moviesFragmentSFL)
-
         moviesDao = context?.let {
             MoviesDatabase.getDatabase(context = it)
                 ?.moviesDao()
         }
+
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
             popularMoviesProgressBar.visibility = View.VISIBLE

@@ -1,4 +1,4 @@
-`package com.example.movieapp.model.network
+package com.example.movieapp.model.network
 
 import android.util.Log
 import com.example.movieapp.model.data.AccountInfo

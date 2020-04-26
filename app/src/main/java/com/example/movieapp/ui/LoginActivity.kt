@@ -8,19 +8,14 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.movieapp.R
 import com.example.movieapp.model.network.RetrofitService
 import com.google.gson.JsonObject
 import kotlinx.coroutines.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.lang.Exception
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.CoroutineContext
-import android.widget.ProgressBar
 
 
 class LoginActivity : AppCompatActivity() {
@@ -30,11 +25,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var password: EditText
     private var requestedToken: String? = null
     private var sessionId: String? = null
-    private val job = Job()
-
-    private val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + job
-    private val uiScope: CoroutineScope = CoroutineScope(coroutineContext)
+    private lateinit var progressBar: ProgressBar
 
     private val job = Job()
     private val coroutineContext: CoroutineContext
@@ -44,6 +35,8 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.registration_page)
+        val pref = this.getSharedPreferences("prefSessionId", Context.MODE_PRIVATE)!!
+        sessionId = pref.getString("session_id", "null")
         bindView()
         checkSession()
     }
@@ -58,6 +51,8 @@ class LoginActivity : AppCompatActivity() {
             if (username.text.toString().isNotEmpty()
                 && password.text.toString().isNotEmpty()
             ) {
+                buttonReg.visibility = View.GONE
+                progressBar.visibility = View.VISIBLE
                 createToken()
             } else Toast.makeText(
                 applicationContext,

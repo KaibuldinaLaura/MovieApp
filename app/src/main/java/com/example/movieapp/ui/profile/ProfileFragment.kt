@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -27,6 +28,7 @@ class ProfileFragment : Fragment() {
     private lateinit var pref: SharedPreferences
     private lateinit var profileName: TextView
     private lateinit var profileUsername: TextView
+    private lateinit var progressBar: ProgressBar
     private var sessionId: String? = null
 
     private val job = Job()
@@ -55,6 +57,7 @@ class ProfileFragment : Fragment() {
     private fun bindView(view: View) = with(view) {
         profileName = view.findViewById(R.id.profileNmae)
         profileUsername = view.findViewById(R.id.profileUsername)
+        progressBar = view.findViewById(R.id.progressBar)
     }
 
     @SuppressLint("SetTextI18n")

@@ -29,8 +29,9 @@ open class FavouritesFragment : Fragment() {
     private var favouriteMoviesAdapter: FavouritesAdapter? = null
     private lateinit var sessionId: String
     private lateinit var navController: NavController
-    private val job = Job()
+    private lateinit var progressBar: ProgressBar
 
+    private val job = Job()
     private val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
     private val uiScope: CoroutineScope = CoroutineScope(coroutineContext)
@@ -55,7 +56,6 @@ open class FavouritesFragment : Fragment() {
         getFavouriteMovies()
         setUpAdapter()
     }
-
 
     private fun bindView(view: View) = with(view){
         progressBar = view.findViewById(R.id.progressBar)
@@ -96,23 +96,20 @@ open class FavouritesFragment : Fragment() {
                     if (response.isSuccessful) {
                         val result = response.body()
                         result?.movies?.forEach {
-                            if (moviesDao?.getMovieById(it.id) == null) {
                                 moviesDao?.insertItem(it)
                                 moviesDao?.updateFavMovie(favourite = 1, movieId = it.id)
-                            } else {
-                                moviesDao?.updateFavMovie(favourite = 1, movieId = it.id)
                                 Log.d("Fav", moviesDao!!.getMovieById(it.id).toString())
-                            }
                         }
                         result?.movies
                     } else {
                         moviesDao?.getFavMovies(favourite = 1) ?: emptyList()
                     }
                 } catch (e: Exception) {
-                    moviesDao?.getFavMovies(favourite = 1) ?: emptyList<MoviesData>()
+                    moviesDao?.getFavMovies(favourite = 1) ?: emptyList()
                 }
             }
             favouriteMoviesAdapter?.addItems(list as ArrayList<MoviesData>)
+            progressBar.visibility = View.GONE
         }
     }
 }

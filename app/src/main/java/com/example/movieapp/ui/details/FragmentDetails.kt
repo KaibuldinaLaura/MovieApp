@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -24,6 +25,7 @@ import kotlin.coroutines.CoroutineContext
 
 class FragmentDetails : Fragment() {
 
+    private lateinit var progressBar: ProgressBar
     private lateinit var movieImage: ImageView
     private lateinit var movieTitle: TextView
     private lateinit var movieRating: TextView
@@ -67,6 +69,7 @@ class FragmentDetails : Fragment() {
         movieDescription = view.findViewById(R.id.movieDescription)
         movieRating = view.findViewById(R.id.rating)
         favouriteButton = view.findViewById(R.id.imageButton)
+        progressBar = view.findViewById(R.id.progressBar)
         movieId = arguments?.getInt("movie_id")
         moviesDao = context?.let {
             MoviesDatabase.getDatabase(context = it)
@@ -107,6 +110,7 @@ class FragmentDetails : Fragment() {
     }
 
     private fun initView(moviesData: MoviesData) {
+        progressBar.visibility = View.GONE
         Glide.with(rootView)
             .load("https://image.tmdb.org/t/p/w342${moviesData.posterPath}")
             .into(movieImage)

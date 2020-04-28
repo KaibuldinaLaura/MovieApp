@@ -65,7 +65,7 @@ class FragmentDetails : Fragment() {
 
     private fun bindView(view: View) = with(view) {
         movieImage = view.findViewById(R.id.movieImageView)
-        movieTitle = view.findViewById(R.id.text_view_title)
+        movieTitle = view.findViewById(R.id.titleTextView)
         movieDescription = view.findViewById(R.id.movieDescription)
         movieRating = view.findViewById(R.id.rating)
         favouriteButton = view.findViewById(R.id.imageButton)

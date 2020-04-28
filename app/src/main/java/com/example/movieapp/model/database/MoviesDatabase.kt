@@ -18,14 +18,14 @@ abstract class MoviesDatabase: RoomDatabase() {
             context: Context
         ): MoviesDatabase? {
             if (INSTANCE == null){
-            INSTANCE = Room.databaseBuilder(
-                context.applicationContext,
-                MoviesDatabase::class.java,
-                "second_database.db"
-            )
-                .fallbackToDestructiveMigration()
-                .build()
-        }
+                INSTANCE = Room.databaseBuilder(
+                    context.applicationContext,
+                    MoviesDatabase::class.java,
+                    "best_team.db"
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
+            }
             return INSTANCE!!
         }
     }

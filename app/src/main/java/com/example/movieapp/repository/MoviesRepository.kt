@@ -28,6 +28,7 @@ class MoviesRepository(application: Application): CoroutineScope {
         val db = MoviesDatabase.getDatabase(application)
         moviesDao = db?.moviesDao()
     }
+
     fun getAllMovies() : List<MoviesData>? {
         return moviesDao?.getAllMovies()
     }
@@ -47,7 +48,7 @@ class MoviesRepository(application: Application): CoroutineScope {
     fun getNowPlayingMovies(nowPlayingMovies: Int): List<MoviesData>? {
         return moviesDao?.getNowPlayingMovies(nowPlayingMovies)
     }
-
+  
     fun insertList(moviesData: List<MoviesData>) {
         launch {
             insertListBG(moviesData)
@@ -116,7 +117,7 @@ class MoviesRepository(application: Application): CoroutineScope {
     suspend fun getAccountIdCoroutine(sessionId: String): Response<AccountInfo> {
         return retrofit.getAccountId(sessionId)
     }
-
+  
     suspend fun getPopularMoviesCoroutine(page: Int): Response<MovieResponse> {
         return retrofit.getPopularMovies(page)
     }

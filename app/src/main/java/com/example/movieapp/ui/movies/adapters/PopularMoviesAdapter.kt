@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.movieapp.R
 import com.example.movieapp.base.BaseRecyclerViewAdapter
+import com.example.movieapp.base.OnItemClickListener
 import com.example.movieapp.model.data.MoviesData
 
 class PopularMoviesAdapter: BaseRecyclerViewAdapter<MoviesData>(){

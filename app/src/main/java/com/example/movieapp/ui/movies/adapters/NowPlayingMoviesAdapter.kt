@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.movieapp.R
 import com.example.movieapp.base.BaseRecyclerViewAdapter
+import com.example.movieapp.base.OnItemClickListener
 import com.example.movieapp.model.data.MoviesData
 
 class NowPlayingMoviesAdapter : BaseRecyclerViewAdapter<MoviesData>() {
@@ -35,7 +36,7 @@ class NowPlayingMoviesAdapter : BaseRecyclerViewAdapter<MoviesData>() {
 
         fun bind(moviesData: MoviesData) {
             Glide.with(itemView)
-                .load("https://image.tmdb.org/t/p/w342${moviesData.posterPath}")
+                .load("https://image.tmdb.org/t/p/w500${moviesData.posterPath}")
                 .into(nowPlayingMovieImage)
         }
 

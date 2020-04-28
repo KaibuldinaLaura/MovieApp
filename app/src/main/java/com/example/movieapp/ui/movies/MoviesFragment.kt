@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,15 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.movieapp.R
 import com.example.movieapp.base.OnItemClickListener
-import com.example.movieapp.model.data.MoviesData
-import com.example.movieapp.model.database.MoviesDao
-import com.example.movieapp.model.database.MoviesDatabase
-import com.example.movieapp.model.network.RetrofitService
-import com.example.movieapp.ui.movies.adapters.PopularMoviesAdapter
 import com.example.movieapp.ui.movies.adapters.NowPlayingMoviesAdapter
-import kotlinx.coroutines.*
-import java.lang.Exception
-import kotlin.coroutines.CoroutineContext
+import com.example.movieapp.ui.movies.adapters.PopularMoviesAdapter
 
 open class MoviesFragment : Fragment() {
 
@@ -34,13 +29,7 @@ open class MoviesFragment : Fragment() {
     private var popularMoviesAdapter: PopularMoviesAdapter? = null
     private var nowPlayingMoviesAdapter: NowPlayingMoviesAdapter? = null
     private lateinit var navController: NavController
-  
-    private val job = Job()
-    private val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + job
-    private val uiScope: CoroutineScope = CoroutineScope(coroutineContext)
-
-    private var moviesDao: MoviesDao? = null
+    private val moviesFragmentViewModel: MoviesFragmentViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,6 +44,7 @@ open class MoviesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         bindView(view)
         setUpAdapter()
+        setData()
     }
 
     private fun bindView(view: View) = with(view) {
@@ -64,10 +54,6 @@ open class MoviesFragment : Fragment() {
         nowPlayingMoviesProgressBar = view.findViewById(R.id.nowPlayingMoviesProgressBar)
         popularMoviesProgressBar = view.findViewById(R.id.popularMoviesProgressBar)
         swipeRefreshLayout = view.findViewById(R.id.moviesFragmentSFL)
-        moviesDao = context?.let {
-            MoviesDatabase.getDatabase(context = it)
-                ?.moviesDao()
-        }
 
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
@@ -75,30 +61,31 @@ open class MoviesFragment : Fragment() {
             nowPlayingMoviesProgressBar.visibility = View.VISIBLE
             popularMoviesAdapter?.clear()
             nowPlayingMoviesAdapter?.clear()
-            getPopularMovies()
-            getNowPlayingMovies()
+            moviesFragmentViewModel.getNowPlayingMovies()
+            moviesFragmentViewModel.getPopularMovies()
         }
     }
 
     private fun setUpAdapter() {
-        popularMoviesRecyclerView.layoutManager = LinearLayoutManager(
-            activity,
+        val popularMoviesLinearLayoutManager = LinearLayoutManager(
+            context,
             LinearLayoutManager.HORIZONTAL,
             false
         )
+        popularMoviesRecyclerView.layoutManager = popularMoviesLinearLayoutManager
+        popularMoviesRecyclerView.setHasFixedSize(true)
         popularMoviesAdapter = PopularMoviesAdapter()
         popularMoviesRecyclerView.adapter = popularMoviesAdapter
 
-        nowPlayingMoviesRecyclerView.layoutManager = LinearLayoutManager(
-            activity,
+        val nowPlayingMoviesLinearLayoutManager = LinearLayoutManager(
+            context,
             LinearLayoutManager.HORIZONTAL,
             false
         )
+        nowPlayingMoviesRecyclerView.layoutManager = nowPlayingMoviesLinearLayoutManager
         nowPlayingMoviesAdapter = NowPlayingMoviesAdapter()
         nowPlayingMoviesRecyclerView.adapter = nowPlayingMoviesAdapter
 
-        getPopularMovies()
-        getNowPlayingMovies()
 
         popularMoviesAdapter?.setOnItemClickListener(onItemClickListener = object :
             OnItemClickListener {
@@ -120,59 +107,29 @@ open class MoviesFragment : Fragment() {
         })
     }
 
-    private fun getPopularMovies(
-        page: Int = 1
-    ) {
-        uiScope.launch {
-            val list = withContext(Dispatchers.IO) {
-                try {
-                    val response =
-                        RetrofitService.getMovieApi().getPopularMovies(page = page)
-                    if (response.isSuccessful) {
-                        val result = response.body()
-                        result?.movies?.forEach {
-                            moviesDao?.insertItem(it)
-                            moviesDao?.updatePopularMovie(1, it.id)
-                        }
-                        result?.movies
-                    } else {
-                        moviesDao?.getPopularMovies(1) ?: emptyList()
-                    }
-                } catch (e: Exception) {
-                    moviesDao?.getPopularMovies(1) ?: emptyList()
-                }
-            }
-            popularMoviesAdapter?.addItems(list as ArrayList<MoviesData>)
-            popularMoviesProgressBar.visibility = View.GONE
-        }
-    }
+    private fun setData() {
+        popularMoviesAdapter?.clear()
+        nowPlayingMoviesAdapter?.clear()
+        moviesFragmentViewModel.getPopularMovies()
+        moviesFragmentViewModel.getNowPlayingMovies()
 
-    private fun getNowPlayingMovies(
-        page: Int = 1
-    ) {
-        uiScope.launch {
-            val list = withContext(Dispatchers.IO) {
-                try {
-                    val response =
-                        RetrofitService.getMovieApi().getNowPlayingMovies(page = page)
-                    if (response.isSuccessful) {
-                        val result = response.body()
-                        result?.movies?.forEach {
-                            moviesDao?.insertItem(it)
-                            moviesDao?.updateNowPlayingMovies(1, it.id)
-                        }
-                        result?.movies
-                    } else {
-                        popularMoviesAdapter?.clear()
-                        moviesDao?.getNowPlayingMovies(1) ?: emptyList()
-                    }
-                } catch (e: Exception) {
-                    popularMoviesAdapter?.clear()
-                    moviesDao?.getNowPlayingMovies(1) ?: emptyList()
+        moviesFragmentViewModel.liveData.observe(viewLifecycleOwner, Observer { result ->
+            when (result) {
+                is MoviesFragmentViewModel.State.ShowLoading -> {
+                    nowPlayingMoviesProgressBar.visibility = View.VISIBLE
+                    popularMoviesProgressBar.visibility = View.VISIBLE
+                }
+                is MoviesFragmentViewModel.State.HideLoading -> {
+                    nowPlayingMoviesProgressBar.visibility = View.GONE
+                    popularMoviesProgressBar.visibility = View.GONE
+                }
+                is MoviesFragmentViewModel.State.PopularMovies -> {
+                    popularMoviesAdapter?.addItems(result.result)
+                }
+                is MoviesFragmentViewModel.State.NowPlayingMovies -> {
+                    nowPlayingMoviesAdapter?.addItems(result.result)
                 }
             }
-            nowPlayingMoviesAdapter?.addItems(list as ArrayList<MoviesData>)
-            nowPlayingMoviesProgressBar.visibility = View.GONE
-        }
+        })
     }
 }

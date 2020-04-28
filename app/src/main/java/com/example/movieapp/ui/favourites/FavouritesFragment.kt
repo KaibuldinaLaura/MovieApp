@@ -2,13 +2,14 @@ package com.example.movieapp.ui.favourites
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,13 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.movieapp.R
 import com.example.movieapp.base.OnItemClickListener
-import com.example.movieapp.model.data.MoviesData
-import com.example.movieapp.model.database.MoviesDao
-import com.example.movieapp.model.database.MoviesDatabase
-import com.example.movieapp.model.network.RetrofitService
-import kotlinx.coroutines.*
-import java.lang.Exception
-import kotlin.coroutines.CoroutineContext
+import com.example.movieapp.ui.details.DetailsFragmentAndFavouritesFragmentViewModel
 
 open class FavouritesFragment : Fragment() {
 
@@ -32,13 +27,8 @@ open class FavouritesFragment : Fragment() {
     private lateinit var navController: NavController
     private lateinit var progressBar: ProgressBar
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-
-    private val job = Job()
-    private val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + job
-    private val uiScope: CoroutineScope = CoroutineScope(coroutineContext)
-
-    private var moviesDao: MoviesDao? = null
+    private val favouriteMoviesFragmentAndFavouritesFragmentViewModel:
+            DetailsFragmentAndFavouritesFragmentViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,8 +45,8 @@ open class FavouritesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindView(view)
-        getFavouriteMovies()
         setUpAdapter()
+        setData()
     }
 
     private fun bindView(view: View) = with(view){
@@ -65,12 +55,11 @@ open class FavouritesFragment : Fragment() {
         navController = Navigation.findNavController(view)
         swipeRefreshLayout = findViewById(R.id.favouritesFragmentSFL)
 
-        moviesDao = context?.let { MoviesDatabase.getDatabase(context = it)?.moviesDao() }
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.isRefreshing = false
             progressBar.visibility = View.VISIBLE
             favouriteMoviesAdapter?.clear()
-            getFavouriteMovies()
+            favouriteMoviesFragmentAndFavouritesFragmentViewModel.getFavouriteMovies(sessionId)
         }
     }
 
@@ -95,31 +84,23 @@ open class FavouritesFragment : Fragment() {
         })
     }
 
-    private fun getFavouriteMovies(
-        page: Int = 1
-    ) {
-        uiScope.launch {
-            val list = withContext(Dispatchers.IO) {
-                try {
-                    val response =
-                        RetrofitService.getMovieApi().getFavoriteMovies(sessionId, page)
-                    if (response.isSuccessful) {
-                        val result = response.body()
-                        result?.movies?.forEach {
-                                moviesDao?.insertItem(it)
-                                moviesDao?.updateFavMovie(favourite = 1, movieId = it.id)
-                                Log.d("Fav", moviesDao!!.getMovieById(it.id).toString())
-                        }
-                        result?.movies
-                    } else {
-                        moviesDao?.getFavMovies(favourite = 1) ?: emptyList()
+    private fun setData() {
+        favouriteMoviesFragmentAndFavouritesFragmentViewModel.getFavouriteMovies(sessionId, 1)
+
+        favouriteMoviesFragmentAndFavouritesFragmentViewModel.liveData.
+            observe(viewLifecycleOwner, Observer { result ->
+                when(result) {
+                    is DetailsFragmentAndFavouritesFragmentViewModel.State.ShowLoading -> {
+                        progressBar.visibility = View.VISIBLE
                     }
-                } catch (e: Exception) {
-                    moviesDao?.getFavMovies(favourite = 1) ?: emptyList()
+                    is DetailsFragmentAndFavouritesFragmentViewModel.State.HideLoading -> {
+                        progressBar.visibility = View.GONE
+                    }
+                    is DetailsFragmentAndFavouritesFragmentViewModel.State.FavouriteMovies -> {
+                        favouriteMoviesAdapter?.addItems(result.result)
+                    }
                 }
-            }
-            favouriteMoviesAdapter?.addItems(list as ArrayList<MoviesData>)
-            progressBar.visibility = View.GONE
-        }
+            })
     }
+
 }

@@ -8,13 +8,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.movieapp.R
-<<<<<<< HEAD:app/src/main/java/com/example/movieapp/ui/movies/adapters/PopularMoviesAdapter.kt
 import com.example.movieapp.base.BaseRecyclerViewAdapter
+import com.example.movieapp.base.OnItemClickListener
 import com.example.movieapp.model.data.MoviesData
-=======
-import com.example.movieapp.model.data.MoviesData
-import com.example.movieapp.base.BaseRecyclerViewAdapter
->>>>>>> master:app/src/main/java/com/example/movieapp/ui/movies/adapters/MoviesAdapter.kt
 
 class PopularMoviesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

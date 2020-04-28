@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.movieapp.R
 import com.example.movieapp.base.BaseRecyclerViewAdapter
+import com.example.movieapp.base.OnItemClickListener
 import com.example.movieapp.model.data.MoviesData
 
 class NowPlayingMoviesAdapter : BaseRecyclerViewAdapter<MoviesData>() {
@@ -19,11 +20,7 @@ class NowPlayingMoviesAdapter : BaseRecyclerViewAdapter<MoviesData>() {
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-<<<<<<< HEAD
         val myHolder = holder as NowPlayingMoviesViewHolder
-=======
-        var myHolder = holder as NowPlayingMoviesViewHolder
->>>>>>> master
         getItem(position)?.let { myHolder.bind(moviesData = it) }
     }
 
@@ -48,9 +45,5 @@ class NowPlayingMoviesAdapter : BaseRecyclerViewAdapter<MoviesData>() {
                 itemClickListener?.onItemClick(adapterPosition, v)
             }
         }
-<<<<<<< HEAD
-=======
-
->>>>>>> master
     }
 }

@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
+
 @Entity(tableName = "movies_table")
 data class MoviesData (
     @PrimaryKey(autoGenerate = true)
@@ -20,5 +21,10 @@ data class MoviesData (
     @SerializedName("vote_average") val rating: Float,
     @ColumnInfo(name = "release_date")
     @SerializedName("release_date") val releaseDate: String,
-     val favourite : Boolean
-)
+    @ColumnInfo(name = "favourite", defaultValue = "0")
+    val favourite: Int,
+    @ColumnInfo(name = "nowPlayingMovies", defaultValue = "0")
+    val nowPlayingMoves: Int,
+    @ColumnInfo(name = "popularMovies", defaultValue = "0")
+    val popularMovies: Int
+   )

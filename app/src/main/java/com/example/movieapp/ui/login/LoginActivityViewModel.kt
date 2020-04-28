@@ -34,7 +34,7 @@ class LoginActivityViewModel(application: Application) : AndroidViewModel(applic
                         if (result != null && !result.username.isNullOrEmpty()) {
                             _liveData.postValue(
                                 State.CheckSession(
-                                2
+                                    2
                                 )
                             )
                         } else {

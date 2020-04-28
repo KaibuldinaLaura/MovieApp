@@ -39,7 +39,7 @@ class NowPlayingMoviesAdapter : BaseRecyclerViewAdapter<MoviesData>() {
 
         fun bind(moviesData: MoviesData) {
             Glide.with(itemView)
-                .load("https://image.tmdb.org/t/p/w500${moviesData.posterPath}")
+                .load("https://image.tmdb.org/t/p/w342${moviesData.posterPath}")
                 .into(nowPlayingMovieImage)
         }
 

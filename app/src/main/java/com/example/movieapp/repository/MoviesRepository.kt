@@ -2,11 +2,13 @@ package com.example.movieapp.repository
 
 import android.app.Application
 import android.util.Log
+import com.example.movieapp.model.data.AccountInfo
 import com.example.movieapp.model.data.MovieResponse
 import com.example.movieapp.model.data.MoviesData
 import com.example.movieapp.model.database.MoviesDao
 import com.example.movieapp.model.database.MoviesDatabase
 import com.example.movieapp.model.network.RetrofitService
+import com.google.gson.JsonObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,8 +29,16 @@ class MoviesRepository(application: Application): CoroutineScope {
         moviesDao = db?.moviesDao()
     }
 
+    fun getAllMovies() : List<MoviesData>? {
+        return moviesDao?.getAllMovies()
+    }
+
     fun getMovieById(movieId: Int): MoviesData? {
         return moviesDao?.getMovieById(movieId)
+    }
+
+    fun getFavMovies(favourite: Int): List<MoviesData>?{
+        return moviesDao?.getFavMovies(favourite)
     }
 
     fun getPopularMovies(popularMovies: Int): List<MoviesData>? {
@@ -37,6 +47,12 @@ class MoviesRepository(application: Application): CoroutineScope {
 
     fun getNowPlayingMovies(nowPlayingMovies: Int): List<MoviesData>? {
         return moviesDao?.getNowPlayingMovies(nowPlayingMovies)
+    }
+  
+    fun insertList(moviesData: List<MoviesData>) {
+        launch {
+            insertListBG(moviesData)
+        }
     }
 
     suspend fun insertListBG(moviesData: List<MoviesData>) {
@@ -54,6 +70,12 @@ class MoviesRepository(application: Application): CoroutineScope {
     suspend fun insetItemBG(moviesData: MoviesData) {
         withContext(Dispatchers.IO) {
             moviesDao?.insertItem(moviesData)
+        }
+    }
+
+    fun updateFavMovie(favourite: Int, movieId: Int) {
+        launch {
+            updateFavMovieBG(favourite, movieId)
         }
     }
 
@@ -88,6 +110,14 @@ class MoviesRepository(application: Application): CoroutineScope {
         }
     }
 
+    fun deleteItem(movieId: Int) {
+        moviesDao?.deleteItem(movieId)
+    }
+
+    suspend fun getAccountIdCoroutine(sessionId: String): Response<AccountInfo> {
+        return retrofit.getAccountId(sessionId)
+    }
+  
     suspend fun getPopularMoviesCoroutine(page: Int): Response<MovieResponse> {
         return retrofit.getPopularMovies(page)
     }
@@ -96,4 +126,15 @@ class MoviesRepository(application: Application): CoroutineScope {
         return retrofit.getNowPlayingMovies(page)
     }
 
+    suspend fun getMovieByIdCoroutine(movieId: Int): Response<MoviesData> {
+        return retrofit.getMovieById(movieId)
+    }
+
+    suspend fun getFavMoviesCoroutine(sessionId: String, page: Int): Response<MovieResponse> {
+        return retrofit.getFavoriteMovies(sessionId, page)
+    }
+
+    suspend fun setMoveMarkCoroutine(sessionId: String, body: JsonObject): Response<JsonObject> {
+        return retrofit.setMovieMark(sessionId, body)
+    }
 }

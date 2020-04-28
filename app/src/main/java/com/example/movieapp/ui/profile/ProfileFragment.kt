@@ -1,6 +1,7 @@
 package com.example.movieapp.ui.profile
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -12,6 +13,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.example.movieapp.R
 import com.example.movieapp.model.data.AccountInfo
 import com.example.movieapp.model.network.RetrofitService
@@ -20,21 +23,17 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.lang.Exception
+import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 
 class ProfileFragment : Fragment() {
 
-    private lateinit var pref: SharedPreferences
     private lateinit var profileName: TextView
     private lateinit var profileUsername: TextView
     private lateinit var progressBar: ProgressBar
     private var sessionId: String? = null
-
-    private val job = Job()
-    private val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + job
-    private val uiScope: CoroutineScope = CoroutineScope(coroutineContext)
+    private val profileFragmentViewModel: ProfileFragmentViewModel by viewModels()
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -43,15 +42,15 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         (activity as AppCompatActivity).supportActionBar?.hide()
-        pref = activity?.getSharedPreferences("prefSessionId", MODE_PRIVATE)!!
-        sessionId = pref.getString("session_id", "empty")
+        val pref = context?.getSharedPreferences("prefSessionId", MODE_PRIVATE)
+        sessionId = pref?.getString("session_id", "empty").toString()
         return inflater.inflate(R.layout.fragment_profile, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindView(view)
-        getAccountDetails()
+        setData()
     }
 
     private fun bindView(view: View) = with(view) {
@@ -61,32 +60,21 @@ class ProfileFragment : Fragment() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun getAccountDetails() {
-        Log.d("start", "account")
-        uiScope.launch {
-            withContext(Dispatchers.IO) {
-                try {
-                    val response = sessionId?.let { RetrofitService.getMovieApi().getAccountId(it) }
-                    if (response != null) {
-                        if (response.isSuccessful) {
-                            val result = response.body()
-                            if (result != null) {
-                                profileName.text = "Name: " + result.name
-                                profileUsername.text = "Username: " + result.username
-                            } else {
-                                Log.e("error", "Cannot get account info:((")
-                            }
-                        } else {
-                            Log.e("error", "Cannot get account info:(((")
-                        }
-                    } else {
-                        Log.e("error", "Cannot get account info:((((")
-                    }
-                } catch (e: Exception) {
-                    Log.e("error", e.toString())
+    private fun setData() {
+        sessionId?.let { profileFragmentViewModel.getAccountDetails(it) }
+        profileFragmentViewModel.liveData.observe(viewLifecycleOwner, Observer { result ->
+            when (result) {
+                is ProfileFragmentViewModel.State.ShowLoading -> {
+                    progressBar.visibility = View.VISIBLE
+                }
+                is ProfileFragmentViewModel.State.HideLoading -> {
+                    progressBar.visibility = View.GONE
+                }
+                is ProfileFragmentViewModel.State.AccountInfo -> {
+                    profileName.text = "Name: " + result.result.name
+                    profileUsername.text = "Username: " + result.result.username
                 }
             }
-            progressBar.visibility = View.GONE
-        }
+        })
     }
 }

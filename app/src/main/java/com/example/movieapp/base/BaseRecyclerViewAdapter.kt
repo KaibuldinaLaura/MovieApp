@@ -33,5 +33,4 @@ abstract class BaseRecyclerViewAdapter<T>: RecyclerView.Adapter<RecyclerView.Vie
     private fun reload() {
         Handler(Looper.getMainLooper()).post { notifyDataSetChanged() }
     }
-
 }

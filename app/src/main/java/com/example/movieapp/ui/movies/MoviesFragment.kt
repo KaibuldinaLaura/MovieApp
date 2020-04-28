@@ -1,6 +1,7 @@
 package com.example.movieapp.ui.movies
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ import com.example.movieapp.R
 import com.example.movieapp.base.OnItemClickListener
 import com.example.movieapp.ui.movies.adapters.NowPlayingMoviesAdapter
 import com.example.movieapp.ui.movies.adapters.PopularMoviesAdapter
+import com.example.movieapp.utils.PaginationListener
 
 open class MoviesFragment : Fragment() {
 
@@ -30,6 +32,16 @@ open class MoviesFragment : Fragment() {
     private var nowPlayingMoviesAdapter: NowPlayingMoviesAdapter? = null
     private lateinit var navController: NavController
     private val moviesFragmentViewModel: MoviesFragmentViewModel by viewModels()
+
+    private var popularMoviesCurrentPage = PaginationListener.PAGE_START
+    private var popularMoviesIsLastPage = false
+    private var popularMoviesIsLoading = false
+    private var popularMoviesItemCount = 0
+
+    private var nowPlayingMoviesCurrentPage = PaginationListener.PAGE_START
+    private var nowPlayingMoviesIsLastPage = false
+    private var nowPlayingMoviesIsLoading = false
+    private var nowPlayingMoviesItemCount = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,8 +71,8 @@ open class MoviesFragment : Fragment() {
             swipeRefreshLayout.isRefreshing = false
             popularMoviesProgressBar.visibility = View.VISIBLE
             nowPlayingMoviesProgressBar.visibility = View.VISIBLE
-            popularMoviesAdapter?.clear()
-            nowPlayingMoviesAdapter?.clear()
+            popularMoviesAdapter?.clearAll()
+            nowPlayingMoviesAdapter?.clearAll()
             moviesFragmentViewModel.getNowPlayingMovies()
             moviesFragmentViewModel.getPopularMovies()
         }
@@ -73,18 +85,41 @@ open class MoviesFragment : Fragment() {
             false
         )
         popularMoviesRecyclerView.layoutManager = popularMoviesLinearLayoutManager
+
         popularMoviesRecyclerView.setHasFixedSize(true)
+        popularMoviesRecyclerView.addOnScrollListener(object :
+            PaginationListener(popularMoviesLinearLayoutManager) {
+            override fun loadMoreItems() {
+                popularMoviesIsLoading = true
+                popularMoviesCurrentPage++
+                moviesFragmentViewModel.getPopularMovies(page = popularMoviesCurrentPage)
+            }
+
+            override fun isLoading(): Boolean = popularMoviesIsLoading
+            override fun isLastPage(): Boolean = popularMoviesIsLastPage
+        })
         popularMoviesAdapter = PopularMoviesAdapter()
         popularMoviesRecyclerView.adapter = popularMoviesAdapter
-
         val nowPlayingMoviesLinearLayoutManager = LinearLayoutManager(
             context,
             LinearLayoutManager.HORIZONTAL,
             false
         )
         nowPlayingMoviesRecyclerView.layoutManager = nowPlayingMoviesLinearLayoutManager
+        nowPlayingMoviesRecyclerView.addOnScrollListener(object :
+            PaginationListener(nowPlayingMoviesLinearLayoutManager) {
+            override fun loadMoreItems() {
+                nowPlayingMoviesIsLoading = true
+                nowPlayingMoviesCurrentPage++
+                moviesFragmentViewModel.getNowPlayingMovies(page = nowPlayingMoviesCurrentPage)
+            }
+
+            override fun isLastPage(): Boolean = nowPlayingMoviesIsLastPage
+            override fun isLoading(): Boolean = nowPlayingMoviesIsLoading
+        })
         nowPlayingMoviesAdapter = NowPlayingMoviesAdapter()
         nowPlayingMoviesRecyclerView.adapter = nowPlayingMoviesAdapter
+
 
 
         popularMoviesAdapter?.setOnItemClickListener(onItemClickListener = object :
@@ -108,10 +143,8 @@ open class MoviesFragment : Fragment() {
     }
 
     private fun setData() {
-        popularMoviesAdapter?.clear()
-        nowPlayingMoviesAdapter?.clear()
-        moviesFragmentViewModel.getPopularMovies()
-        moviesFragmentViewModel.getNowPlayingMovies()
+        popularMoviesAdapter?.clearAll()
+        nowPlayingMoviesAdapter?.clearAll()
 
         moviesFragmentViewModel.liveData.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
@@ -124,10 +157,30 @@ open class MoviesFragment : Fragment() {
                     popularMoviesProgressBar.visibility = View.GONE
                 }
                 is MoviesFragmentViewModel.State.PopularMovies -> {
+                    popularMoviesItemCount = result.result.size
+                    if (popularMoviesCurrentPage != PaginationListener.PAGE_START) {
+                        popularMoviesAdapter?.removeLoading()
+                    }
                     popularMoviesAdapter?.addItems(result.result)
+                    if (popularMoviesCurrentPage < result.totalPages) {
+                        popularMoviesAdapter?.addLoading()
+                    } else {
+                        popularMoviesIsLastPage = true
+                    }
+                    popularMoviesIsLoading = false
                 }
                 is MoviesFragmentViewModel.State.NowPlayingMovies -> {
+                    nowPlayingMoviesItemCount = result.result.size
+                    if (nowPlayingMoviesCurrentPage != PaginationListener.PAGE_START) {
+                        nowPlayingMoviesAdapter?.removeLoading()
+                    }
                     nowPlayingMoviesAdapter?.addItems(result.result)
+                    if (nowPlayingMoviesCurrentPage < result.totalPages) {
+                        nowPlayingMoviesAdapter?.addLoading()
+                    } else {
+                        nowPlayingMoviesIsLastPage = true
+                    }
+                    nowPlayingMoviesIsLoading = false
                 }
             }
         })

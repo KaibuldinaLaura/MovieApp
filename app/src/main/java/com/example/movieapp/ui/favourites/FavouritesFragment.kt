@@ -49,7 +49,7 @@ open class FavouritesFragment : Fragment() {
         setData()
     }
 
-    private fun bindView(view: View) = with(view){
+    private fun bindView(view: View) = with(view) {
         progressBar = view.findViewById(R.id.progressBar)
         favouriteMoviesRecyclerView = view.findViewById(R.id.favouriteMoviesRecyclerView)
         navController = Navigation.findNavController(view)
@@ -87,9 +87,10 @@ open class FavouritesFragment : Fragment() {
     private fun setData() {
         favouriteMoviesFragmentAndFavouritesFragmentViewModel.getFavouriteMovies(sessionId, 1)
 
-        favouriteMoviesFragmentAndFavouritesFragmentViewModel.liveData.
-            observe(viewLifecycleOwner, Observer { result ->
-                when(result) {
+        favouriteMoviesFragmentAndFavouritesFragmentViewModel.liveData.observe(
+            viewLifecycleOwner,
+            Observer { result ->
+                when (result) {
                     is DetailsFragmentAndFavouritesFragmentViewModel.State.ShowLoading -> {
                         progressBar.visibility = View.VISIBLE
                     }
@@ -102,5 +103,4 @@ open class FavouritesFragment : Fragment() {
                 }
             })
     }
-
 }

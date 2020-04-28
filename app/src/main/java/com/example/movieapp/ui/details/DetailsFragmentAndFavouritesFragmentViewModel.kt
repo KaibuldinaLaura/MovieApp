@@ -60,11 +60,13 @@ class DetailsFragmentAndFavouritesFragmentViewModel(application: Application) :
                         val result = response.body()
                         result?.movies?.forEach {
                             it.id.let { id ->
-                                if (moviesRepository.getMovieById(id) != null) {
+                                if (id?.let { movieId -> moviesRepository.getMovieById(movieId) } != null) {
                                     moviesRepository.updateFavMovie(1, id)
                                 } else {
                                     moviesRepository.insertItem(it)
-                                    moviesRepository.updateFavMovie(1, id)
+                                    if (id != null) {
+                                        moviesRepository.updateFavMovie(1, id)
+                                    }
                                 }
                             }
                         }
@@ -78,8 +80,6 @@ class DetailsFragmentAndFavouritesFragmentViewModel(application: Application) :
             }
             _liveData.value = State.HideLoading
             _liveData.value = State.FavouriteMovies(list as ArrayList<MoviesData>)
-            // favList = list as ArrayList<MoviesData>
-            //checkFavList()
         }
     }
 
@@ -100,12 +100,11 @@ class DetailsFragmentAndFavouritesFragmentViewModel(application: Application) :
                             0
                         }
                         moviesRepository.updateFavMovie(fav, movieId)
-                        //getFavouriteMovies()
                     } else {
                         Log.e("Error", "Cannot mark as favourite")
                     }
                 } catch (e: Exception) {
-                    Log.e("Error", "Cannot mark as favourite")
+                    Log.e("Error", e.toString())
                 }
             }
         }

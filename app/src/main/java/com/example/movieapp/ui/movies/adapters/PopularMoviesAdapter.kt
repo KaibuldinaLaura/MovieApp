@@ -12,12 +12,77 @@ import com.example.movieapp.base.BaseRecyclerViewAdapter
 import com.example.movieapp.base.OnItemClickListener
 import com.example.movieapp.model.data.MoviesData
 
-class PopularMoviesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
+class PopularMoviesAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+
+    private val VIEW_TYPE_LOADING = 0
+    private val VIEW_TYPE_NORMAL = 1
+
+    var itemClickListener: OnItemClickListener? = null
+    private var isLoaderVisible = false
+
+    private val movieList = ArrayList<MoviesData>()
+
+    fun clearAll() {
+        movieList.clear()
+        notifyDataSetChanged()
+    }
+
+    fun removeLoading() {
+        isLoaderVisible = false
+        val position = movieList.size - 1
+        if (movieList.isNotEmpty()) {
+            val item = getItem(position)
+            if (item != null) {
+                movieList.removeAt(position)
+                notifyItemRemoved(position)
+            }
+        }
+    }
+
+    fun getItem(position: Int) : MoviesData? {
+        return movieList[position]
+    }
+
+    fun addItems(list: List<MoviesData>) {
+        movieList.addAll(list)
+        notifyDataSetChanged()
+    }
+
+    fun setOnItemClickListener(onItemClickListener: OnItemClickListener) {
+        this.itemClickListener = onItemClickListener
+    }
+
+    fun addLoading() {
+        isLoaderVisible = true
+        movieList.add(MoviesData(id = -1, favourite = 0, popularMovies = 1, nowPlayingMoves = 0))
+        notifyItemInserted(movieList.size - 1)
+    }
+
+    override fun getItemCount(): Int = movieList.size
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return MoviesViewHolder(
-            LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_movie, parent, false)
-        )
+        val inflater = LayoutInflater.from(parent.context)
+        return when(viewType) {
+            VIEW_TYPE_NORMAL -> MoviesViewHolder (
+                inflater.inflate(R.layout.item_movie, parent, false)
+            )
+            VIEW_TYPE_LOADING -> ProgressViewHolder (
+                inflater.inflate(R.layout.item_movie_loading, parent, false)
+            )
+            else -> throw Throwable("invalid view")
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return if(isLoaderVisible) {
+            if (position == movieList.size - 1) {
+                VIEW_TYPE_LOADING
+            } else {
+                VIEW_TYPE_NORMAL
+            }
+        } else {
+            VIEW_TYPE_NORMAL
+        }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -50,6 +115,9 @@ class PopularMoviesAdapter: BaseRecyclerViewAdapter<MoviesData>(){
                 itemClickListener?.onItemClick(adapterPosition, v)
             }
         }
+    }
+    inner class ProgressViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+         fun clear() { }
     }
 }
 

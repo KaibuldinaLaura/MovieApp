@@ -25,6 +25,11 @@ class MoviesFragmentViewModel(application: Application) : AndroidViewModel(appli
 
     private var moviesRepository: MoviesRepository = MoviesRepository(application)
 
+    init {
+        getPopularMovies()
+        getNowPlayingMovies()
+    }
+
     fun getPopularMovies(
         page: Int = 1
     ) {
@@ -37,6 +42,7 @@ class MoviesFragmentViewModel(application: Application) : AndroidViewModel(appli
                     val response = moviesRepository.getPopularMoviesCoroutine(page)
                     if (response.isSuccessful) {
                         val result = response.body()
+                        val totalPages = result?.pages
                         result?.movies?.forEach {
                             it.id?.let { id ->
                                 if (moviesRepository.getMovieById(id) != null) {
@@ -47,18 +53,25 @@ class MoviesFragmentViewModel(application: Application) : AndroidViewModel(appli
                                 }
                             }
                         }
-                        result?.movies
+                        Pair(result?.movies, totalPages)
                     } else {
-                        moviesRepository.getPopularMovies(1) ?: emptyList()
+                        Pair(
+                            moviesRepository.getPopularMovies(1) ?: emptyList(), 1
+                        )
                     }
                 } catch (e: Exception) {
-                    moviesRepository.getPopularMovies(1) ?: emptyList()
+                    Pair(
+                        moviesRepository.getPopularMovies(1) ?: emptyList(), 1
+                    )
                 }
             }
             _liveData.value = State.HideLoading
-            _liveData.value = State.PopularMovies(
-                result = list as ArrayList<MoviesData>
-            )
+            _liveData.value = list.second?.let {
+                State.PopularMovies(
+                    totalPages = it,
+                    result = list.first as ArrayList<MoviesData>
+                )
+            }
         }
     }
 
@@ -74,6 +87,7 @@ class MoviesFragmentViewModel(application: Application) : AndroidViewModel(appli
                     val response = moviesRepository.getNowPlayingMovesCoroutine(page)
                     if (response.isSuccessful) {
                         val result = response.body()
+                        val totalPages = result?.pages
                         result?.movies?.forEach {
                             it.id?.let { id ->
                                 if (moviesRepository.getMovieById(id) != null) {
@@ -84,27 +98,40 @@ class MoviesFragmentViewModel(application: Application) : AndroidViewModel(appli
                                 }
                             }
                         }
-                        result?.movies
+                        Pair(result?.movies, totalPages)
                     } else {
-                        moviesRepository.getNowPlayingMovies(1) ?: emptyList()
+                        Pair(
+                            moviesRepository.getNowPlayingMovies(1) ?: emptyList(), 1
+                        )
                     }
                 } catch (e: Exception) {
-                    moviesRepository.getNowPlayingMovies(1) ?: emptyList()
+                    Pair(
+                        moviesRepository.getNowPlayingMovies(1) ?: emptyList(), 1
+                    )
                 }
             }
             _liveData.value = State.HideLoading
-            _liveData.value = State.NowPlayingMovies(
-                result = list as ArrayList<MoviesData>
-            )
+            _liveData.value = list.second?.let {
+                State.NowPlayingMovies(
+                    totalPages = it,
+                    result = list.first as ArrayList<MoviesData>
+                )
+            }
         }
     }
 
     sealed class State {
         object ShowLoading : State()
         object HideLoading : State()
-        data class PopularMovies(val result: ArrayList<MoviesData>) : State()
-        data class NowPlayingMovies(val result: ArrayList<MoviesData>) :
-            State()
+        data class PopularMovies(
+            val totalPages: Int,
+            val result: ArrayList<MoviesData>
+        ) : State()
+
+        data class NowPlayingMovies(
+            val totalPages: Int,
+            val result: ArrayList<MoviesData>
+        ) : State()
     }
 
     override fun onCleared() {

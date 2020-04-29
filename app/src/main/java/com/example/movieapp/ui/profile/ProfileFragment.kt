@@ -18,6 +18,7 @@ import androidx.lifecycle.Observer
 import com.example.movieapp.R
 import com.example.movieapp.model.data.AccountInfo
 import com.example.movieapp.model.network.RetrofitService
+import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -34,6 +35,7 @@ class ProfileFragment : Fragment() {
     private lateinit var progressBar: ProgressBar
     private var sessionId: String? = null
     private val profileFragmentViewModel: ProfileFragmentViewModel by viewModels()
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -41,6 +43,10 @@ class ProfileFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        firebaseAnalytics = FirebaseAnalytics.getInstance(activity as AppCompatActivity)
+        val bundle = Bundle()
+        bundle.putString("page_name", "Profile Page")
+        firebaseAnalytics.logEvent("Profile_page", bundle)
         (activity as AppCompatActivity).supportActionBar?.hide()
         val pref = context?.getSharedPreferences("prefSessionId", MODE_PRIVATE)
         sessionId = pref?.getString("session_id", "empty").toString()

@@ -16,6 +16,7 @@ import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.example.movieapp.R
 import com.example.movieapp.model.data.MoviesData
+import com.google.firebase.analytics.FirebaseAnalytics
 
 class FragmentDetails : Fragment() {
 
@@ -29,8 +30,18 @@ class FragmentDetails : Fragment() {
     private var favButtonState = false
     private var movieId: Int? = 0
     private lateinit var sessionId: String
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+
     private val detailsFragmentAndFavouritesFragmentViewModel:
             DetailsFragmentAndFavouritesFragmentViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val bundle = Bundle()
+        firebaseAnalytics = FirebaseAnalytics.getInstance(activity as AppCompatActivity)
+        bundle.putString("page_name", "Details Page")
+        firebaseAnalytics.logEvent("Details_page", bundle)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,6 +71,11 @@ class FragmentDetails : Fragment() {
         movieId = arguments?.getInt("movie_id")
 
         favouriteButton.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putString("movie_name", movieTitle.toString())
+            bundle.putString("movie_id", movieId.toString())
+            firebaseAnalytics.logEvent("Favourite_Button", bundle)
+
             movieId?.let { id ->
                 detailsFragmentAndFavouritesFragmentViewModel.
                     setFavouriteMovies(

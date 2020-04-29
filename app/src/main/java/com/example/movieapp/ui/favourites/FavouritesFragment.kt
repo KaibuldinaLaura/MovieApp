@@ -18,6 +18,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.movieapp.R
 import com.example.movieapp.base.OnItemClickListener
 import com.example.movieapp.ui.details.DetailsFragmentAndFavouritesFragmentViewModel
+import com.google.firebase.analytics.FirebaseAnalytics
 
 open class FavouritesFragment : Fragment() {
 
@@ -27,8 +28,23 @@ open class FavouritesFragment : Fragment() {
     private lateinit var navController: NavController
     private lateinit var progressBar: ProgressBar
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+
     private val favouriteMoviesFragmentAndFavouritesFragmentViewModel:
             DetailsFragmentAndFavouritesFragmentViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        onCreateComponent()
+        firebaseAnalytics = FirebaseAnalytics.getInstance(activity as AppCompatActivity)
+        val bundle = Bundle()
+        bundle.putString("page_name", "Favourites Page")
+        firebaseAnalytics.logEvent("Favourites_page", bundle)
+    }
+
+    private fun onCreateComponent() {
+        favouriteMoviesAdapter = FavouritesAdapter()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,6 +91,14 @@ open class FavouritesFragment : Fragment() {
         favouriteMoviesAdapter?.setOnItemClickListener(onItemClickListener = object :
             OnItemClickListener {
             override fun onItemClick(position: Int, view: View) {
+                val param = Bundle()
+                val movieName = favouriteMoviesAdapter?.getItem(position)?.title
+                val movieId = favouriteMoviesAdapter?.getItem(position)?.id.toString()
+                param.putString("movie_name", movieName)
+                param.putString("movie_id", movieId)
+                if (movieName != null) {
+                    firebaseAnalytics.logEvent("movie_name", param)
+                }
                 val bundle = Bundle()
                 favouriteMoviesAdapter?.getItem(position)?.id?.let {
                     bundle.putInt("movie_id", it)

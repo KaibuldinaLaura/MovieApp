@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.example.movieapp.R
 import com.example.movieapp.ui.MainActivity
+import com.google.firebase.analytics.FirebaseAnalytics
 
 
 class LoginActivity : AppCompatActivity() {
@@ -24,6 +25,7 @@ class LoginActivity : AppCompatActivity() {
     private var sessionId: String? = null
     private lateinit var progressBar: ProgressBar
     private val loginActivityViewModel: LoginActivityViewModel by viewModels()
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +33,7 @@ class LoginActivity : AppCompatActivity() {
         this.supportActionBar?.hide()
         val pref = this.getSharedPreferences("prefSessionId", Context.MODE_PRIVATE)
         sessionId = pref.getString("session_id", "null")
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this)
         bindView()
         setData()
     }
@@ -45,6 +48,9 @@ class LoginActivity : AppCompatActivity() {
             if (username.text.toString().isNotEmpty()
                 && password.text.toString().isNotEmpty()
             ) {
+                val param = Bundle()
+                param.putString(FirebaseAnalytics.Param.METHOD, "google")
+                firebaseAnalytics.logEvent("Login_button", param)
                 loginActivityViewModel.createLogin(
                     username.text.toString(),
                     password.text.toString()

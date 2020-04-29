@@ -12,6 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCVh1qXIleHis8fvmmFgGW14qT-a6DRPuo"/>
+
         <activity android:name=".ui.details.FragmentDetails">
         </activity>
 

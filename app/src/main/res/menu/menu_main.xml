@@ -13,4 +13,8 @@
         android:id="@+id/profileFragment"
         android:icon="@drawable/ic_account_circle_black_24dp"
         android:title="Profile" />
+    <item
+        android:id="@+id/cinemaMapFragment"
+        android:icon="@drawable/map_icon"
+        android:title="Map"/>
 </menu>

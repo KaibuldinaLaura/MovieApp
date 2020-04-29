@@ -20,6 +20,7 @@ import com.example.movieapp.base.OnItemClickListener
 import com.example.movieapp.ui.movies.adapters.NowPlayingMoviesAdapter
 import com.example.movieapp.ui.movies.adapters.PopularMoviesAdapter
 import com.example.movieapp.utils.PaginationListener
+import com.google.firebase.analytics.FirebaseAnalytics
 
 open class MoviesFragment : Fragment() {
 
@@ -28,6 +29,8 @@ open class MoviesFragment : Fragment() {
     private lateinit var nowPlayingMoviesProgressBar: ProgressBar
     private lateinit var popularMoviesProgressBar: ProgressBar
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+
     private var popularMoviesAdapter: PopularMoviesAdapter? = null
     private var nowPlayingMoviesAdapter: NowPlayingMoviesAdapter? = null
     private lateinit var navController: NavController
@@ -42,6 +45,21 @@ open class MoviesFragment : Fragment() {
     private var nowPlayingMoviesIsLastPage = false
     private var nowPlayingMoviesIsLoading = false
     private var nowPlayingMoviesItemCount = 0
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        (activity as AppCompatActivity).supportActionBar?.hide()
+        super.onCreate(savedInstanceState)
+        onCreateComponent()
+        firebaseAnalytics = FirebaseAnalytics.getInstance(activity as AppCompatActivity)
+        val bundle = Bundle()
+        bundle.putString("page_name", "Home Page")
+        firebaseAnalytics.logEvent("Home_page", bundle)
+    }
+
+    private fun onCreateComponent() {
+        popularMoviesAdapter = PopularMoviesAdapter()
+        nowPlayingMoviesAdapter = NowPlayingMoviesAdapter()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -126,7 +144,15 @@ open class MoviesFragment : Fragment() {
             OnItemClickListener {
             override fun onItemClick(position: Int, view: View) {
                 val bundle = Bundle()
-                popularMoviesAdapter?.getItem(position)?.id?.let { bundle.putInt("movie_id", it) }
+                val param = Bundle()
+                val movieName = popularMoviesAdapter?.getItem(position)?.title
+                val movieId = popularMoviesAdapter?.getItem(position)?.id.toString()
+                param.putString("movie_name", movieName)
+                param.putString("movie_id", movieId)
+                if (movieName != null) {
+                    firebaseAnalytics.logEvent("movie_name", param)
+                }
+                bundle.putInt("movie_id", movieId.toInt())
                 navController.navigate(R.id.action_moviesFragment_to_fragmentDetails, bundle)
             }
         })

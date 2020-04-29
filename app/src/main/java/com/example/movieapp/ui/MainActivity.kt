@@ -23,7 +23,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.favouritesFragment,
                 R.id.moviesFragment,
                 R.id.profileFragment,
-                R.id.detailsFragment
+                R.id.detailsFragment,
+                R.id.cinemaMapFragment
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)

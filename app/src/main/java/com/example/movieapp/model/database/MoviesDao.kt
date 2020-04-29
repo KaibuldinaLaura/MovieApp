@@ -42,5 +42,4 @@ interface MoviesDao  {
 
     @Query("SELECT * FROM movies_table WHERE id = :movieId")
     fun getMovieById(movieId: Int): MoviesData
-
 }

@@ -5,7 +5,10 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.movieapp.repository.CinemaRepository
 import com.example.movieapp.repository.MoviesRepository
+import com.example.movieapp.utils.CinemaArrayList
+import com.example.movieapp.utils.CinemaList
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
@@ -21,6 +24,7 @@ class ProfileFragmentViewModel(application: Application) : AndroidViewModel(appl
         get() = _liveData
 
     private var moviesRepository: MoviesRepository = MoviesRepository(application)
+    private var cinemaRepository: CinemaRepository = CinemaRepository(application)
 
     fun getAccountDetails(sessionId: String) {
         uiScope.launch {

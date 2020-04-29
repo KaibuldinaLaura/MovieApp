@@ -33,4 +33,8 @@
         android:name="com.example.movieapp.ui.details.FragmentDetails"
         android:label="FragmentDetails"
         tools:layout="@layout/fragment_details"/>
+    <fragment
+        android:id="@+id/cinemaMapFragment"
+        android:name="com.example.movieapp.ui.cinema.CinemaMapFragment"
+        android:label="CinemaMapFragment" />
 </navigation>
